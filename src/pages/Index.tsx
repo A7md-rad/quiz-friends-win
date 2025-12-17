@@ -6,6 +6,7 @@ import { QuizResult } from '@/components/QuizResult';
 import { FriendsList } from '@/components/FriendsList';
 import { ChallengeSetup } from '@/components/ChallengeSetup';
 import { Leaderboard } from '@/components/Leaderboard';
+import { ProfilePage } from '@/components/ProfilePage';
 import { Screen, Subject, Friend } from '@/types/app';
 import { friends } from '@/data/mockData';
 
@@ -57,6 +58,14 @@ const Index = () => {
     }
   };
 
+  const goToProfile = () => {
+    setCurrentScreen('profile');
+  };
+
+  const goToLeaderboard = () => {
+    setCurrentScreen('leaderboard');
+  };
+
   // Render current screen
   const renderScreen = () => {
     switch (currentScreen) {
@@ -65,6 +74,8 @@ const Index = () => {
           <WelcomeScreen
             onSoloChallenge={() => goToSubjectSelection(false)}
             onFriendsChallenge={goToFriendsList}
+            onProfile={goToProfile}
+            onLeaderboard={goToLeaderboard}
           />
         );
 
@@ -122,14 +133,21 @@ const Index = () => {
       case 'leaderboard':
         return (
           <Leaderboard
-            userScore={quizResult.score}
+            userScore={quizResult.score || 160}
             onNewChallenge={goToFriendsList}
             onHome={goToWelcome}
           />
         );
 
+      case 'profile':
+        return (
+          <ProfilePage
+            onBack={goToWelcome}
+          />
+        );
+
       default:
-        return <WelcomeScreen onSoloChallenge={() => goToSubjectSelection(false)} onFriendsChallenge={goToFriendsList} />;
+        return <WelcomeScreen onSoloChallenge={() => goToSubjectSelection(false)} onFriendsChallenge={goToFriendsList} onProfile={goToProfile} onLeaderboard={goToLeaderboard} />;
     }
   };
 

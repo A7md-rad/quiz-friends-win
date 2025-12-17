@@ -6,7 +6,8 @@ export type Screen =
   | 'friends-list' 
   | 'challenge-setup' 
   | 'challenge-quiz'
-  | 'leaderboard';
+  | 'leaderboard'
+  | 'profile';
 
 export interface User {
   id: string;
