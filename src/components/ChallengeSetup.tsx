@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Play, Users } from 'lucide-react';
+import { ArrowRight, Play, Users, User, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, type LucideIcon } from 'lucide-react';
 import { subjects } from '@/data/mockData';
 import { Subject, Friend } from '@/types/app';
 import { cn } from '@/lib/utils';
@@ -13,6 +12,24 @@ interface ChallengeSetupProps {
 
 const questionCounts = [5, 10, 15];
 
+const iconMap: Record<string, LucideIcon> = {
+  calculator: Calculator,
+  atom: Atom,
+  flask: FlaskConical,
+  leaf: Leaf,
+  book: BookOpen,
+  languages: Languages,
+};
+
+const colorClasses: Record<string, { bg: string; icon: string }> = {
+  primary: { bg: 'gradient-primary', icon: 'text-primary-foreground' },
+  secondary: { bg: 'gradient-physics', icon: 'text-physics-foreground' },
+  accent: { bg: 'gradient-accent', icon: 'text-accent-foreground' },
+  success: { bg: 'gradient-success', icon: 'text-success-foreground' },
+  warning: { bg: 'gradient-secondary', icon: 'text-secondary-foreground' },
+  arabic: { bg: 'gradient-arabic', icon: 'text-arabic-foreground' },
+};
+
 export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: ChallengeSetupProps) {
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedCount, setSelectedCount] = useState(10);
@@ -24,18 +41,21 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col dotted-bg">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowRight className="w-6 h-6" />
-          </Button>
+      <div className="p-5">
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <button 
+            onClick={onBack}
+            className="absolute right-5 w-12 h-12 rounded-xl flex items-center justify-center hover:bg-card/50 transition-colors"
+          >
+            <ArrowRight className="w-7 h-7 text-foreground" />
+          </button>
           <h1 className="text-2xl font-bold text-foreground">إعداد التحدي</h1>
         </div>
       </div>
 
-      <div className="flex-1 p-6 space-y-8">
+      <div className="flex-1 px-5 space-y-8">
         {/* Selected friends */}
         <div>
           <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
@@ -46,9 +66,11 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
             {selectedFriends.map(friend => (
               <div 
                 key={friend.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/30"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-card shadow-card"
               >
-                <span className="text-xl">{friend.avatar}</span>
+                <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center">
+                  <User className="w-4 h-4 text-secondary" />
+                </div>
                 <span className="font-medium text-foreground">{friend.name}</span>
               </div>
             ))}
@@ -59,21 +81,30 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
         <div>
           <h2 className="text-lg font-bold text-foreground mb-4">اختر المادة</h2>
           <div className="grid grid-cols-3 gap-3">
-            {subjects.map(subject => (
-              <button
-                key={subject.id}
-                onClick={() => setSelectedSubject(subject)}
-                className={cn(
-                  'p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-2',
-                  selectedSubject?.id === subject.id
-                    ? 'border-primary bg-primary/10 shadow-glow-primary'
-                    : 'border-border bg-card hover:border-primary/50'
-                )}
-              >
-                <span className="text-2xl">{subject.icon}</span>
-                <span className="text-sm font-medium text-foreground">{subject.name}</span>
-              </button>
-            ))}
+            {subjects.map(subject => {
+              const Icon = iconMap[subject.icon];
+              const colors = colorClasses[subject.color] || colorClasses.primary;
+              const isSelected = selectedSubject?.id === subject.id;
+              
+              return (
+                <button
+                  key={subject.id}
+                  onClick={() => setSelectedSubject(subject)}
+                  className={cn(
+                    'p-4 rounded-2xl bg-card shadow-card transition-all duration-300 flex flex-col items-center gap-3',
+                    isSelected ? 'ring-2 ring-primary scale-[1.02]' : 'hover:shadow-md'
+                  )}
+                >
+                  <div className={cn(
+                    'w-12 h-12 rounded-xl flex items-center justify-center',
+                    colors.bg
+                  )}>
+                    {Icon && <Icon className={cn('w-6 h-6', colors.icon)} />}
+                  </div>
+                  <span className="text-sm font-medium text-foreground">{subject.name}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -86,10 +117,10 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
                 key={count}
                 onClick={() => setSelectedCount(count)}
                 className={cn(
-                  'flex-1 py-4 rounded-xl border-2 font-bold text-xl transition-all duration-300',
+                  'flex-1 py-4 rounded-2xl font-bold text-xl transition-all duration-300',
                   selectedCount === count
-                    ? 'border-secondary bg-secondary/10 text-secondary shadow-glow-secondary'
-                    : 'border-border bg-card text-foreground hover:border-secondary/50'
+                    ? 'gradient-secondary text-secondary-foreground shadow-glow-secondary'
+                    : 'bg-card shadow-card text-foreground hover:shadow-md'
                 )}
               >
                 {count}
@@ -100,12 +131,12 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
 
         {/* Summary */}
         {selectedSubject && (
-          <div className="bg-card rounded-2xl p-5 shadow-card border border-border animate-scale-in">
+          <div className="bg-card rounded-3xl p-5 shadow-card animate-scale-in">
             <h3 className="font-bold text-foreground mb-4">ملخص التحدي</h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">المادة</span>
-                <span className="font-medium text-foreground">{selectedSubject.icon} {selectedSubject.name}</span>
+                <span className="font-medium text-foreground">{selectedSubject.name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">عدد الأسئلة</span>
@@ -121,17 +152,22 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
-        <Button
-          variant="secondary"
-          size="lg"
-          className="w-full"
+      <div className="p-5">
+        <button
           disabled={!selectedSubject}
           onClick={handleStart}
+          className={cn(
+            'w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.98]',
+            selectedSubject
+              ? 'gradient-primary text-primary-foreground shadow-glow-primary'
+              : 'bg-muted text-muted-foreground'
+          )}
         >
-          <Play className="ml-2 w-5 h-5" />
-          ابدأ التحدي
-        </Button>
+          <div className="flex items-center justify-center gap-2">
+            <Play className="w-5 h-5" />
+            ابدأ التحدي
+          </div>
+        </button>
       </div>
     </div>
   );

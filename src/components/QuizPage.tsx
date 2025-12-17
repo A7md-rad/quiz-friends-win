@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, X, Check, Trophy, Calculator, Zap, FlaskConical, Leaf, BookOpen, Languages, User, Sparkles, type LucideIcon } from 'lucide-react';
+import { X, Check, Star, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, User, Sparkles, type LucideIcon } from 'lucide-react';
 import { Subject, Question, QuizState } from '@/types/app';
 import { sampleQuestions, currentUser, friends } from '@/data/mockData';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ interface QuizPageProps {
 
 const subjectIconMap: Record<string, LucideIcon> = {
   calculator: Calculator,
-  zap: Zap,
+  atom: Atom,
   flask: FlaskConical,
   leaf: Leaf,
   book: BookOpen,
@@ -37,7 +37,6 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
 
   const currentQ = questions[state.currentQuestion];
   const progress = ((state.currentQuestion + 1) / questions.length) * 100;
-  const SubjectIcon = subjectIconMap[subject.icon] || BookOpen;
 
   // Simulate opponent score in challenge mode
   useEffect(() => {
@@ -101,117 +100,108 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-card dotted-bg">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex items-center justify-between mb-3">
-          <Button variant="ghost" size="icon" onClick={handleExit}>
-            <X className="w-5 h-5" />
-          </Button>
-
-          {/* Score display */}
-          <div className="flex items-center gap-4">
-            {isChallenge && opponent && (
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted">
-                <User className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">{opponentScore}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full gradient-primary text-primary-foreground">
-              <Trophy className="w-4 h-4" />
-              <span className="font-bold">{state.score}</span>
-            </div>
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          {/* Points badge */}
+          <div className="flex items-center gap-2 px-5 py-3 rounded-full gradient-secondary">
+            <span className="text-lg font-bold text-secondary-foreground">{currentUser.points + state.score}</span>
+            <Star className="w-5 h-5 text-secondary-foreground fill-secondary-foreground" />
           </div>
+
+          {/* Close button */}
+          <button 
+            onClick={handleExit}
+            className="w-12 h-12 rounded-xl flex items-center justify-center hover:bg-muted/50 transition-colors"
+          >
+            <X className="w-7 h-7 text-muted-foreground" />
+          </button>
         </div>
 
+        {/* Progress section */}
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-primary font-bold">{state.currentQuestion + 1}/{questions.length}</span>
+          <span className="text-muted-foreground">التقدم</span>
+        </div>
+        
         {/* Progress bar */}
-        <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div 
-            className="absolute inset-y-0 right-0 gradient-primary rounded-full transition-all duration-500"
+            className="h-full gradient-primary rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-center text-sm text-muted-foreground mt-2">
-          {state.currentQuestion + 1} / {questions.length}
-        </p>
       </div>
 
       {/* Question */}
-      <div className="flex-1 p-6 flex flex-col">
-        <div className="flex-1 flex flex-col justify-center">
-          {/* Subject badge */}
-          <div className="flex justify-center mb-6">
-            <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center gap-2">
-              <SubjectIcon className="w-4 h-4" />
-              {subject.name}
-            </span>
-          </div>
+      <div className="flex-1 px-5 flex flex-col">
+        {/* Question card */}
+        <div className="bg-card rounded-3xl p-6 shadow-card mb-6 animate-scale-in">
+          <p className="text-xl font-bold text-foreground text-center leading-relaxed">
+            {currentQ.text}
+          </p>
+        </div>
 
-          {/* Question text */}
-          <div className="bg-card rounded-2xl p-6 shadow-card mb-8 animate-scale-in">
-            <p className="text-xl font-bold text-foreground text-center leading-relaxed">
-              {currentQ.text}
-            </p>
-          </div>
+        {/* Options */}
+        <div className="space-y-3 flex-1">
+          {currentQ.options.map((option, index) => {
+            const isSelected = selectedAnswer === index;
+            const isCorrectAnswer = index === currentQ.correctAnswer;
+            const showCorrect = showFeedback && isCorrectAnswer;
+            const showWrong = showFeedback && isSelected && !isCorrectAnswer;
+            const letter = String.fromCharCode(65 + index);
 
-          {/* Options */}
-          <div className="space-y-3">
-            {currentQ.options.map((option, index) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrectAnswer = index === currentQ.correctAnswer;
-              const showCorrect = showFeedback && isCorrectAnswer;
-              const showWrong = showFeedback && isSelected && !isCorrectAnswer;
+            return (
+              <button
+                key={index}
+                onClick={() => handleSelectAnswer(index)}
+                disabled={showFeedback}
+                className={cn(
+                  'w-full p-4 rounded-2xl border-2 transition-all duration-300',
+                  'flex items-center gap-4',
+                  !showFeedback && !isSelected && 'border-border bg-card hover:border-primary/40',
+                  !showFeedback && isSelected && 'border-primary bg-primary/5',
+                  showCorrect && 'border-success bg-success/10',
+                  showWrong && 'border-destructive bg-destructive/10 animate-shake'
+                )}
+              >
+                {/* Option letter */}
+                <span className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shrink-0 border-2',
+                  !showFeedback && 'border-muted-foreground/30 text-muted-foreground bg-muted',
+                  showCorrect && 'border-success bg-success text-success-foreground',
+                  showWrong && 'border-destructive bg-destructive text-destructive-foreground'
+                )}>
+                  {showCorrect ? <Check className="w-5 h-5" /> : 
+                   showWrong ? <X className="w-5 h-5" /> : 
+                   letter}
+                </span>
 
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleSelectAnswer(index)}
-                  disabled={showFeedback}
-                  className={cn(
-                    'w-full p-4 rounded-xl border-2 text-right transition-all duration-300',
-                    'flex items-center gap-3',
-                    !showFeedback && !isSelected && 'border-border bg-card hover:border-primary/50 hover:bg-primary/5',
-                    !showFeedback && isSelected && 'border-primary bg-primary/10',
-                    showCorrect && 'border-success bg-success/10 animate-celebrate',
-                    showWrong && 'border-destructive bg-destructive/10 animate-shake'
-                  )}
-                >
-                  {/* Option letter */}
-                  <span className={cn(
-                    'w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg shrink-0',
-                    !showFeedback && 'bg-muted text-muted-foreground',
-                    showCorrect && 'bg-success text-success-foreground',
-                    showWrong && 'bg-destructive text-destructive-foreground'
-                  )}>
-                    {showCorrect ? <Check className="w-5 h-5" /> : 
-                     showWrong ? <X className="w-5 h-5" /> : 
-                     String.fromCharCode(65 + index)}
-                  </span>
-
-                  {/* Option text */}
-                  <span className={cn(
-                    'font-medium flex-1',
-                    showCorrect && 'text-success',
-                    showWrong && 'text-destructive'
-                  )}>
-                    {option}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                {/* Option text */}
+                <span className={cn(
+                  'font-semibold flex-1 text-right text-lg',
+                  !showFeedback && 'text-foreground',
+                  showCorrect && 'text-success',
+                  showWrong && 'text-destructive'
+                )}>
+                  {option}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Feedback toast */}
         {showFeedback && (
           <div className={cn(
-            'fixed bottom-24 left-4 right-4 p-4 rounded-xl shadow-lg animate-slide-up',
+            'fixed bottom-28 left-5 right-5 p-4 rounded-2xl shadow-lg animate-slide-up',
             isCorrect ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground'
           )}>
             <div className="flex items-center justify-center gap-2">
               {isCorrect ? (
                 <>
-                  <Sparkles className="w-5 h-5 animate-pulse-slow" />
+                  <Sparkles className="w-5 h-5" />
                   <span className="font-bold">إجابة صحيحة! +{currentQ.points}</span>
                 </>
               ) : (
@@ -226,31 +216,13 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={handleExit}
-          >
-            إنهاء
-          </Button>
-          <Button
-            variant="default"
-            className="flex-1"
-            onClick={handleNext}
-            disabled={selectedAnswer === null && !showFeedback}
-          >
-            {state.currentQuestion < questions.length - 1 ? (
-              <>
-                التالي
-                <ArrowLeft className="mr-2 w-4 h-4" />
-              </>
-            ) : (
-              'إنهاء الاختبار'
-            )}
-          </Button>
-        </div>
+      <div className="p-5">
+        <button
+          onClick={handleExit}
+          className="w-full py-4 rounded-2xl border-2 border-primary text-primary font-bold text-lg hover:bg-primary/5 transition-colors"
+        >
+          إنهاء
+        </button>
       </div>
     </div>
   );

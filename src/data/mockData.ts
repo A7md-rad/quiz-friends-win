@@ -15,11 +15,11 @@ export const friends: Friend[] = [
 
 export const subjects: Subject[] = [
   { id: 'math', name: 'رياضيات', icon: 'calculator', color: 'primary', questionsCount: 50 },
-  { id: 'physics', name: 'فيزياء', icon: 'zap', color: 'secondary', questionsCount: 40 },
+  { id: 'physics', name: 'فيزياء', icon: 'atom', color: 'secondary', questionsCount: 40 },
   { id: 'chemistry', name: 'كيمياء', icon: 'flask', color: 'accent', questionsCount: 35 },
   { id: 'biology', name: 'أحياء', icon: 'leaf', color: 'success', questionsCount: 45 },
-  { id: 'arabic', name: 'لغة عربية', icon: 'book', color: 'warning', questionsCount: 60 },
-  { id: 'english', name: 'إنجليزي', icon: 'languages', color: 'primary', questionsCount: 55 },
+  { id: 'arabic', name: 'لغة عربية', icon: 'book', color: 'arabic', questionsCount: 60 },
+  { id: 'english', name: 'إنجليزي', icon: 'languages', color: 'warning', questionsCount: 55 },
 ];
 
 export const sampleQuestions: Record<string, Question[]> = {
