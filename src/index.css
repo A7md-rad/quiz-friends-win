@@ -184,6 +184,14 @@
   .animate-scale-in {
     animation: scale-in 0.3s ease-out;
   }
+
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  .animate-wiggle {
+    animation: wiggle 1s ease-in-out infinite;
+  }
 }
 
 @keyframes bounce-gentle {
@@ -223,4 +231,9 @@
 @keyframes scale-in {
   0% { transform: scale(0.9); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
 }

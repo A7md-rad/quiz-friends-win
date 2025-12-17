@@ -3,23 +3,23 @@ import { User, Friend, Subject, Question } from '@/types/app';
 export const currentUser: User = {
   id: '1',
   name: 'يوسف',
-  avatar: '👨‍🎓',
+  avatar: 'user',
   points: 120,
 };
 
 export const friends: Friend[] = [
-  { id: '2', name: 'أحمد', avatar: '👦', points: 150, isOnline: true },
-  { id: '3', name: 'صالح', avatar: '🧑', points: 95, isOnline: true },
-  { id: '4', name: 'خالد', avatar: '👨', points: 60, isOnline: false },
+  { id: '2', name: 'أحمد', avatar: 'user', points: 150, isOnline: true },
+  { id: '3', name: 'صالح', avatar: 'user', points: 95, isOnline: true },
+  { id: '4', name: 'خالد', avatar: 'user', points: 60, isOnline: false },
 ];
 
 export const subjects: Subject[] = [
-  { id: 'math', name: 'رياضيات', icon: '📐', color: 'primary', questionsCount: 50 },
-  { id: 'physics', name: 'فيزياء', icon: '⚡', color: 'secondary', questionsCount: 40 },
-  { id: 'chemistry', name: 'كيمياء', icon: '🧪', color: 'accent', questionsCount: 35 },
-  { id: 'biology', name: 'أحياء', icon: '🌿', color: 'success', questionsCount: 45 },
-  { id: 'arabic', name: 'لغة عربية', icon: '📖', color: 'warning', questionsCount: 60 },
-  { id: 'english', name: 'إنجليزي', icon: '🔤', color: 'primary', questionsCount: 55 },
+  { id: 'math', name: 'رياضيات', icon: 'calculator', color: 'primary', questionsCount: 50 },
+  { id: 'physics', name: 'فيزياء', icon: 'zap', color: 'secondary', questionsCount: 40 },
+  { id: 'chemistry', name: 'كيمياء', icon: 'flask', color: 'accent', questionsCount: 35 },
+  { id: 'biology', name: 'أحياء', icon: 'leaf', color: 'success', questionsCount: 45 },
+  { id: 'arabic', name: 'لغة عربية', icon: 'book', color: 'warning', questionsCount: 60 },
+  { id: 'english', name: 'إنجليزي', icon: 'languages', color: 'primary', questionsCount: 55 },
 ];
 
 export const sampleQuestions: Record<string, Question[]> = {

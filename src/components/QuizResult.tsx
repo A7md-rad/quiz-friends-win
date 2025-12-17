@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Trophy, RotateCcw, BookOpen, Home, Share2, Star } from 'lucide-react';
+import { Trophy, RotateCcw, BookOpen, Home, Share2, Star, CheckCircle, XCircle, Sparkles, Calculator, Zap, FlaskConical, Leaf, Languages, type LucideIcon } from 'lucide-react';
 import { Subject } from '@/types/app';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,15 @@ interface QuizResultProps {
   onSelectSubject: () => void;
   onHome: () => void;
 }
+
+const subjectIconMap: Record<string, LucideIcon> = {
+  calculator: Calculator,
+  zap: Zap,
+  flask: FlaskConical,
+  leaf: Leaf,
+  book: BookOpen,
+  languages: Languages,
+};
 
 export function QuizResult({ 
   score, 
@@ -27,32 +36,26 @@ export function QuizResult({
   const isGood = percentage >= 60 && percentage < 80;
   const isPoor = percentage < 60;
 
-  const getMessage = () => {
-    if (isExcellent) return { text: 'ممتاز! 🎉', emoji: '🏆' };
-    if (isGood) return { text: 'جيد جداً! 👏', emoji: '⭐' };
-    return { text: 'حاول مرة أخرى! 💪', emoji: '📚' };
-  };
-
-  const message = getMessage();
+  const SubjectIcon = subjectIconMap[subject.icon] || BookOpen;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background celebration */}
       {isExcellent && (
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <div
+          {[...Array(15)].map((_, i) => (
+            <Star
               key={i}
-              className="absolute animate-float"
+              className="absolute text-warning fill-warning animate-float"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 2}s`,
-                fontSize: `${Math.random() * 20 + 15}px`,
+                width: `${Math.random() * 20 + 12}px`,
+                height: `${Math.random() * 20 + 12}px`,
+                opacity: 0.6,
               }}
-            >
-              {['⭐', '🎉', '✨', '🏆'][Math.floor(Math.random() * 4)]}
-            </div>
+            />
           ))}
         </div>
       )}
@@ -65,17 +68,23 @@ export function QuizResult({
           isGood && 'gradient-secondary shadow-glow-secondary',
           isPoor && 'bg-muted'
         )}>
-          <span className="text-6xl">{message.emoji}</span>
+          {isExcellent && <Trophy className="w-14 h-14 text-primary-foreground animate-bounce-gentle" />}
+          {isGood && <Star className="w-14 h-14 text-secondary-foreground animate-pulse-slow" />}
+          {isPoor && <BookOpen className="w-14 h-14 text-muted-foreground" />}
         </div>
 
         {/* Message */}
         <h1 className="text-3xl font-extrabold text-foreground mb-2">
-          {message.text}
+          {isExcellent && 'ممتاز!'}
+          {isGood && 'جيد جداً!'}
+          {isPoor && 'حاول مرة أخرى!'}
+          {isExcellent && <Sparkles className="inline w-8 h-8 mr-2 text-warning animate-pulse-slow" />}
         </h1>
 
         {/* Subject */}
-        <p className="text-muted-foreground mb-8">
-          {subject.icon} {subject.name}
+        <p className="text-muted-foreground mb-8 flex items-center justify-center gap-2">
+          <SubjectIcon className="w-5 h-5 text-primary" />
+          {subject.name}
         </p>
 
         {/* Score card */}
@@ -91,11 +100,13 @@ export function QuizResult({
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-success/10">
+            <div className="p-4 rounded-xl bg-success/10 flex flex-col items-center">
+              <CheckCircle className="w-8 h-8 text-success mb-1" />
               <p className="text-3xl font-bold text-success">{correctAnswers}</p>
               <p className="text-sm text-muted-foreground">إجابة صحيحة</p>
             </div>
-            <div className="p-4 rounded-xl bg-destructive/10">
+            <div className="p-4 rounded-xl bg-destructive/10 flex flex-col items-center">
+              <XCircle className="w-8 h-8 text-destructive mb-1" />
               <p className="text-3xl font-bold text-destructive">{totalQuestions - correctAnswers}</p>
               <p className="text-sm text-muted-foreground">إجابة خاطئة</p>
             </div>

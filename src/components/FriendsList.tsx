@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, UserPlus, Swords, Check } from 'lucide-react';
+import { ArrowRight, UserPlus, Swords, Check, User, Star } from 'lucide-react';
 import { friends, currentUser } from '@/data/mockData';
 import { Friend } from '@/types/app';
 import { cn } from '@/lib/utils';
@@ -40,11 +40,14 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
         <div className="bg-card rounded-2xl p-4 shadow-card mb-6 border-2 border-primary/20">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center">
-              <span className="text-3xl">{currentUser.avatar}</span>
+              <User className="w-7 h-7 text-primary-foreground" />
             </div>
             <div className="flex-1">
               <p className="font-bold text-foreground text-lg">{currentUser.name}</p>
-              <p className="text-primary font-semibold">{currentUser.points} نقطة ⭐</p>
+              <p className="text-primary font-semibold flex items-center gap-1">
+                {currentUser.points} نقطة
+                <Star className="w-4 h-4 text-warning fill-warning animate-pulse-slow" />
+              </p>
             </div>
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
               أنت
@@ -86,7 +89,10 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
                       'w-12 h-12 rounded-xl flex items-center justify-center',
                       isSelected ? 'bg-secondary/20' : 'bg-muted'
                     )}>
-                      <span className="text-2xl">{friend.avatar}</span>
+                      <User className={cn(
+                        'w-6 h-6',
+                        isSelected ? 'text-secondary' : 'text-muted-foreground'
+                      )} />
                     </div>
                     {/* Online indicator */}
                     {friend.isOnline && (

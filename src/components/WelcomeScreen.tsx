@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { User, Users, LogIn } from 'lucide-react';
+import { User, Users, LogIn, Gamepad2, Star, Rocket } from 'lucide-react';
 import { currentUser } from '@/data/mockData';
 
 interface WelcomeScreenProps {
@@ -19,10 +19,15 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge }: WelcomeSc
 
       {/* User points badge */}
       <div className="absolute top-6 left-6 flex items-center gap-2 bg-card rounded-full px-4 py-2 shadow-card">
-        <span className="text-2xl">{currentUser.avatar}</span>
+        <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
+          <User className="w-5 h-5 text-primary-foreground" />
+        </div>
         <div className="flex flex-col">
           <span className="text-sm font-medium text-foreground">{currentUser.name}</span>
-          <span className="text-xs text-primary font-bold">{currentUser.points} نقطة ⭐</span>
+          <span className="text-xs text-primary font-bold flex items-center gap-1">
+            {currentUser.points} نقطة
+            <Star className="w-3 h-3 text-warning fill-warning animate-pulse-slow" />
+          </span>
         </div>
       </div>
 
@@ -31,7 +36,7 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge }: WelcomeSc
         {/* Logo / App icon */}
         <div className="mb-6 animate-float">
           <div className="w-28 h-28 mx-auto rounded-3xl gradient-primary flex items-center justify-center shadow-glow-primary">
-            <span className="text-6xl">🎮</span>
+            <Gamepad2 className="w-14 h-14 text-primary-foreground animate-wiggle" />
           </div>
         </div>
 
@@ -41,8 +46,9 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge }: WelcomeSc
         </h1>
 
         {/* Tagline */}
-        <p className="text-lg text-muted-foreground mb-10">
-          تعلم باللعب ونافس أصدقاءك! 🚀
+        <p className="text-lg text-muted-foreground mb-10 flex items-center justify-center gap-2">
+          تعلم باللعب ونافس أصدقاءك!
+          <Rocket className="w-5 h-5 text-secondary animate-bounce-gentle" />
         </p>
 
         {/* Main buttons */}
