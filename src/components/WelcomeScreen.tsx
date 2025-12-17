@@ -1,19 +1,23 @@
-import { Button } from '@/components/ui/button';
 import { User, Users, Gamepad2, Star, Trophy } from 'lucide-react';
 import { currentUser } from '@/data/mockData';
 
 interface WelcomeScreenProps {
   onSoloChallenge: () => void;
   onFriendsChallenge: () => void;
+  onProfile?: () => void;
+  onLeaderboard?: () => void;
 }
 
-export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge }: WelcomeScreenProps) {
+export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, onLeaderboard }: WelcomeScreenProps) {
   return (
     <div className="min-h-screen flex flex-col p-6 relative dotted-bg">
       {/* Header with profile, points, and trophy */}
       <div className="flex items-center justify-between mb-12">
         {/* Profile button */}
-        <button className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center">
+        <button 
+          onClick={onProfile}
+          className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center hover:shadow-md transition-shadow active:scale-95"
+        >
           <User className="w-6 h-6 text-primary" />
         </button>
 
@@ -24,7 +28,10 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge }: WelcomeSc
         </div>
 
         {/* Trophy button */}
-        <button className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center">
+        <button 
+          onClick={onLeaderboard}
+          className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center hover:shadow-md transition-shadow active:scale-95"
+        >
           <Trophy className="w-6 h-6 text-warning" />
         </button>
       </div>
