@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft, X, Check, Trophy } from 'lucide-react';
+import { ArrowLeft, X, Check, Trophy, Calculator, Zap, FlaskConical, Leaf, BookOpen, Languages, User, Sparkles, type LucideIcon } from 'lucide-react';
 import { Subject, Question, QuizState } from '@/types/app';
 import { sampleQuestions, currentUser, friends } from '@/data/mockData';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,15 @@ interface QuizPageProps {
   isChallenge?: boolean;
   opponent?: typeof friends[0];
 }
+
+const subjectIconMap: Record<string, LucideIcon> = {
+  calculator: Calculator,
+  zap: Zap,
+  flask: FlaskConical,
+  leaf: Leaf,
+  book: BookOpen,
+  languages: Languages,
+};
 
 export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opponent }: QuizPageProps) {
   const questions = sampleQuestions[subject.id] || sampleQuestions.math;
@@ -28,6 +37,7 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
 
   const currentQ = questions[state.currentQuestion];
   const progress = ((state.currentQuestion + 1) / questions.length) * 100;
+  const SubjectIcon = subjectIconMap[subject.icon] || BookOpen;
 
   // Simulate opponent score in challenge mode
   useEffect(() => {
@@ -103,7 +113,7 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
           <div className="flex items-center gap-4">
             {isChallenge && opponent && (
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted">
-                <span className="text-sm">{opponent.avatar}</span>
+                <User className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-muted-foreground">{opponentScore}</span>
               </div>
             )}
@@ -131,8 +141,9 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
         <div className="flex-1 flex flex-col justify-center">
           {/* Subject badge */}
           <div className="flex justify-center mb-6">
-            <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              {subject.icon} {subject.name}
+            <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center gap-2">
+              <SubjectIcon className="w-4 h-4" />
+              {subject.name}
             </span>
           </div>
 
@@ -200,13 +211,13 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
             <div className="flex items-center justify-center gap-2">
               {isCorrect ? (
                 <>
-                  <Check className="w-5 h-5" />
-                  <span className="font-bold">إجابة صحيحة! +{currentQ.points} 🎉</span>
+                  <Sparkles className="w-5 h-5 animate-pulse-slow" />
+                  <span className="font-bold">إجابة صحيحة! +{currentQ.points}</span>
                 </>
               ) : (
                 <>
                   <X className="w-5 h-5" />
-                  <span className="font-bold">إجابة غير صحيحة 😅</span>
+                  <span className="font-bold">إجابة غير صحيحة</span>
                 </>
               )}
             </div>

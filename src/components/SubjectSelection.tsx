@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Calculator, Zap, FlaskConical, Leaf, BookOpen, Languages, type LucideIcon } from 'lucide-react';
 import { subjects } from '@/data/mockData';
 import { Subject } from '@/types/app';
 import { cn } from '@/lib/utils';
@@ -26,6 +26,23 @@ const iconBgVariants: Record<string, string> = {
   warning: 'bg-warning/20',
 };
 
+const iconColorVariants: Record<string, string> = {
+  primary: 'text-primary',
+  secondary: 'text-secondary',
+  accent: 'text-accent',
+  success: 'text-success',
+  warning: 'text-warning',
+};
+
+const iconMap: Record<string, LucideIcon> = {
+  calculator: Calculator,
+  zap: Zap,
+  flask: FlaskConical,
+  leaf: Leaf,
+  book: BookOpen,
+  languages: Languages,
+};
+
 export function SubjectSelection({ onSelectSubject, onBack, title = 'اختر المادة' }: SubjectSelectionProps) {
   return (
     <div className="min-h-screen flex flex-col p-6">
@@ -39,36 +56,44 @@ export function SubjectSelection({ onSelectSubject, onBack, title = 'اختر ا
 
       {/* Subject grid */}
       <div className="grid grid-cols-2 gap-4 flex-1">
-        {subjects.map((subject, index) => (
-          <button
-            key={subject.id}
-            onClick={() => onSelectSubject(subject)}
-            className={cn(
-              'relative p-5 rounded-2xl border-2 bg-gradient-to-br transition-all duration-300',
-              'hover:scale-[1.02] hover:shadow-card-hover active:scale-[0.98]',
-              'flex flex-col items-center justify-center gap-3 min-h-[140px]',
-              'animate-slide-up',
-              colorVariants[subject.color]
-            )}
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
-            {/* Icon */}
-            <div className={cn(
-              'w-14 h-14 rounded-xl flex items-center justify-center',
-              iconBgVariants[subject.color]
-            )}>
-              <span className="text-3xl">{subject.icon}</span>
-            </div>
+        {subjects.map((subject, index) => {
+          const Icon = iconMap[subject.icon];
+          return (
+            <button
+              key={subject.id}
+              onClick={() => onSelectSubject(subject)}
+              className={cn(
+                'relative p-5 rounded-2xl border-2 bg-gradient-to-br transition-all duration-300',
+                'hover:scale-[1.02] hover:shadow-card-hover active:scale-[0.98]',
+                'flex flex-col items-center justify-center gap-3 min-h-[140px]',
+                'animate-slide-up group',
+                colorVariants[subject.color]
+              )}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              {/* Icon */}
+              <div className={cn(
+                'w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110',
+                iconBgVariants[subject.color]
+              )}>
+                {Icon && (
+                  <Icon className={cn(
+                    'w-8 h-8 transition-all duration-300 group-hover:animate-wiggle',
+                    iconColorVariants[subject.color]
+                  )} />
+                )}
+              </div>
 
-            {/* Name */}
-            <span className="font-bold text-foreground text-lg">{subject.name}</span>
+              {/* Name */}
+              <span className="font-bold text-foreground text-lg">{subject.name}</span>
 
-            {/* Questions count */}
-            <span className="text-xs text-muted-foreground">
-              {subject.questionsCount} سؤال
-            </span>
-          </button>
-        ))}
+              {/* Questions count */}
+              <span className="text-xs text-muted-foreground">
+                {subject.questionsCount} سؤال
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

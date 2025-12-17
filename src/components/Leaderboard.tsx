@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Trophy, Swords, Share2, Home, Medal } from 'lucide-react';
+import { Trophy, Swords, Share2, Home, Medal, Crown, Award, User } from 'lucide-react';
 import { leaderboardData, currentUser } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
@@ -8,18 +8,6 @@ interface LeaderboardProps {
   onNewChallenge: () => void;
   onHome: () => void;
 }
-
-const rankColors = {
-  1: 'from-warning/30 to-warning/10 border-warning/50',
-  2: 'from-muted/50 to-muted/20 border-muted-foreground/30',
-  3: 'from-secondary/30 to-secondary/10 border-secondary/50',
-};
-
-const rankIcons = {
-  1: '🥇',
-  2: '🥈',
-  3: '🥉',
-};
 
 export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardProps) {
   // Sort by score including user's new score
@@ -35,11 +23,20 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
   const rest = sortedData.slice(3);
   const userRank = sortedData.find(item => item.id === currentUser.id)?.rank || 0;
 
+  const getRankIcon = (rank: number) => {
+    switch(rank) {
+      case 1: return <Crown className="w-7 h-7 text-warning animate-bounce-gentle" />;
+      case 2: return <Medal className="w-6 h-6 text-muted-foreground" />;
+      case 3: return <Award className="w-6 h-6 text-secondary" />;
+      default: return null;
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <div className="p-6 text-center gradient-primary">
-        <Trophy className="w-12 h-12 mx-auto mb-3 text-primary-foreground" />
+        <Trophy className="w-12 h-12 mx-auto mb-3 text-primary-foreground animate-pulse-slow" />
         <h1 className="text-2xl font-extrabold text-primary-foreground">لوحة المتصدرين</h1>
         <p className="text-primary-foreground/80 mt-1">نتائج التحدي</p>
       </div>
@@ -51,9 +48,9 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
           {top3[1] && (
             <div className="flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-4 border-card shadow-lg">
-                <span className="text-3xl">{top3[1].avatar}</span>
+                <User className="w-8 h-8 text-muted-foreground" />
               </div>
-              <span className="text-2xl mt-1">{rankIcons[2]}</span>
+              <div className="mt-1">{getRankIcon(2)}</div>
               <p className="font-bold text-foreground text-sm mt-1">{top3[1].name}</p>
               <p className="text-xs text-muted-foreground">{top3[1].points} نقطة</p>
               <div className="w-20 h-16 mt-2 rounded-t-lg bg-muted/50" />
@@ -64,9 +61,9 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
           {top3[0] && (
             <div className="flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
               <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center border-4 border-warning shadow-glow-primary">
-                <span className="text-4xl">{top3[0].avatar}</span>
+                <User className="w-10 h-10 text-primary-foreground" />
               </div>
-              <span className="text-3xl mt-1 animate-bounce-gentle">{rankIcons[1]}</span>
+              <div className="mt-1">{getRankIcon(1)}</div>
               <p className="font-bold text-foreground mt-1">{top3[0].name}</p>
               <p className="text-sm text-primary font-bold">{top3[0].points} نقطة</p>
               <div className="w-24 h-24 mt-2 rounded-t-lg gradient-primary/30" />
@@ -77,9 +74,9 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
           {top3[2] && (
             <div className="flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center border-4 border-card shadow-lg">
-                <span className="text-3xl">{top3[2].avatar}</span>
+                <User className="w-8 h-8 text-secondary" />
               </div>
-              <span className="text-2xl mt-1">{rankIcons[3]}</span>
+              <div className="mt-1">{getRankIcon(3)}</div>
               <p className="font-bold text-foreground text-sm mt-1">{top3[2].name}</p>
               <p className="text-xs text-muted-foreground">{top3[2].points} نقطة</p>
               <div className="w-20 h-12 mt-2 rounded-t-lg bg-secondary/20" />
@@ -120,7 +117,7 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
                   {item.rank}
                 </span>
                 <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                  <span className="text-xl">{item.avatar}</span>
+                  <User className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <span className="flex-1 font-medium text-foreground">{item.name}</span>
                 <span className="font-bold text-foreground">{item.points}</span>
