@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Trophy, RotateCcw, BookOpen, Home, Share2, Star, CheckCircle, XCircle, Sparkles, Calculator, Zap, FlaskConical, Leaf, Languages, type LucideIcon } from 'lucide-react';
+import { Trophy, RotateCcw, BookOpen, Home, Share2, Star, CheckCircle, XCircle, Calculator, Atom, FlaskConical, Leaf, Languages, type LucideIcon } from 'lucide-react';
 import { Subject } from '@/types/app';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +14,7 @@ interface QuizResultProps {
 
 const subjectIconMap: Record<string, LucideIcon> = {
   calculator: Calculator,
-  zap: Zap,
+  atom: Atom,
   flask: FlaskConical,
   leaf: Leaf,
   book: BookOpen,
@@ -39,11 +38,11 @@ export function QuizResult({
   const SubjectIcon = subjectIconMap[subject.icon] || BookOpen;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 dotted-bg relative overflow-hidden">
       {/* Background celebration */}
       {isExcellent && (
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(12)].map((_, i) => (
             <Star
               key={i}
               className="absolute text-warning fill-warning animate-float"
@@ -51,9 +50,9 @@ export function QuizResult({
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 2}s`,
-                width: `${Math.random() * 20 + 12}px`,
-                height: `${Math.random() * 20 + 12}px`,
-                opacity: 0.6,
+                width: `${Math.random() * 16 + 12}px`,
+                height: `${Math.random() * 16 + 12}px`,
+                opacity: 0.4,
               }}
             />
           ))}
@@ -63,13 +62,13 @@ export function QuizResult({
       <div className="relative z-10 w-full max-w-md text-center">
         {/* Trophy icon */}
         <div className={cn(
-          'w-28 h-28 mx-auto rounded-full flex items-center justify-center mb-6 animate-celebrate',
+          'w-28 h-28 mx-auto rounded-[2rem] flex items-center justify-center mb-6 animate-celebrate',
           isExcellent && 'gradient-primary shadow-glow-primary',
           isGood && 'gradient-secondary shadow-glow-secondary',
           isPoor && 'bg-muted'
         )}>
-          {isExcellent && <Trophy className="w-14 h-14 text-primary-foreground animate-bounce-gentle" />}
-          {isGood && <Star className="w-14 h-14 text-secondary-foreground animate-pulse-slow" />}
+          {isExcellent && <Trophy className="w-14 h-14 text-primary-foreground" />}
+          {isGood && <Star className="w-14 h-14 text-secondary-foreground" />}
           {isPoor && <BookOpen className="w-14 h-14 text-muted-foreground" />}
         </div>
 
@@ -78,7 +77,6 @@ export function QuizResult({
           {isExcellent && 'ممتاز!'}
           {isGood && 'جيد جداً!'}
           {isPoor && 'حاول مرة أخرى!'}
-          {isExcellent && <Sparkles className="inline w-8 h-8 mr-2 text-warning animate-pulse-slow" />}
         </h1>
 
         {/* Subject */}
@@ -88,53 +86,27 @@ export function QuizResult({
         </p>
 
         {/* Score card */}
-        <div className="bg-card rounded-2xl p-6 shadow-card mb-8 animate-scale-in">
+        <div className="bg-card rounded-3xl p-6 shadow-card mb-8 animate-scale-in">
           {/* Main score */}
           <div className="mb-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Trophy className="w-6 h-6 text-primary" />
-              <span className="text-5xl font-extrabold text-gradient-primary">{score}</span>
+              <span className="text-5xl font-extrabold text-primary">{score}</span>
             </div>
             <p className="text-muted-foreground">نقطة</p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-success/10 flex flex-col items-center">
+            <div className="p-4 rounded-2xl bg-success/10 flex flex-col items-center">
               <CheckCircle className="w-8 h-8 text-success mb-1" />
               <p className="text-3xl font-bold text-success">{correctAnswers}</p>
-              <p className="text-sm text-muted-foreground">إجابة صحيحة</p>
+              <p className="text-sm text-muted-foreground">صحيحة</p>
             </div>
-            <div className="p-4 rounded-xl bg-destructive/10 flex flex-col items-center">
+            <div className="p-4 rounded-2xl bg-destructive/10 flex flex-col items-center">
               <XCircle className="w-8 h-8 text-destructive mb-1" />
               <p className="text-3xl font-bold text-destructive">{totalQuestions - correctAnswers}</p>
-              <p className="text-sm text-muted-foreground">إجابة خاطئة</p>
-            </div>
-          </div>
-
-          {/* Percentage bar */}
-          <div className="mt-6">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-muted-foreground">النسبة</span>
-              <span className={cn(
-                'font-bold',
-                isExcellent && 'text-success',
-                isGood && 'text-secondary',
-                isPoor && 'text-destructive'
-              )}>
-                {percentage}%
-              </span>
-            </div>
-            <div className="h-3 bg-muted rounded-full overflow-hidden">
-              <div 
-                className={cn(
-                  'h-full rounded-full transition-all duration-1000',
-                  isExcellent && 'gradient-success',
-                  isGood && 'gradient-secondary',
-                  isPoor && 'bg-destructive'
-                )}
-                style={{ width: `${percentage}%` }}
-              />
+              <p className="text-sm text-muted-foreground">خاطئة</p>
             </div>
           </div>
 
@@ -144,7 +116,7 @@ export function QuizResult({
               <Star
                 key={i}
                 className={cn(
-                  'w-8 h-8 transition-all duration-300',
+                  'w-10 h-10 transition-all duration-300',
                   i < Math.ceil(percentage / 40) 
                     ? 'text-warning fill-warning animate-celebrate' 
                     : 'text-muted'
@@ -157,46 +129,27 @@ export function QuizResult({
 
         {/* Action buttons */}
         <div className="space-y-3">
-          <Button
-            variant="default"
-            size="lg"
-            className="w-full"
+          <button
             onClick={onRetry}
+            className="w-full py-4 px-8 rounded-2xl gradient-primary text-primary-foreground font-bold text-lg shadow-glow-primary hover:opacity-95 transition-opacity active:scale-[0.98]"
           >
-            <RotateCcw className="ml-2 w-5 h-5" />
             إعادة المحاولة
-          </Button>
+          </button>
 
-          <Button
-            variant="secondary"
-            size="lg"
-            className="w-full"
+          <button
             onClick={onSelectSubject}
+            className="w-full py-4 px-8 rounded-2xl gradient-secondary text-secondary-foreground font-bold text-lg shadow-glow-secondary hover:opacity-95 transition-opacity active:scale-[0.98]"
           >
-            <BookOpen className="ml-2 w-5 h-5" />
             اختيار مادة أخرى
-          </Button>
+          </button>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full"
+          <button
             onClick={onHome}
+            className="w-full py-4 px-8 rounded-2xl border-2 border-primary text-primary font-bold text-lg hover:bg-primary/5 transition-colors active:scale-[0.98]"
           >
-            <Home className="ml-2 w-5 h-5" />
             العودة للرئيسية
-          </Button>
+          </button>
         </div>
-
-        {/* Share button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-6 text-muted-foreground"
-        >
-          <Share2 className="ml-1 w-4 h-4" />
-          مشاركة النتيجة
-        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Trophy, Swords, Share2, Home, Medal, Crown, Award, User } from 'lucide-react';
+import { Trophy, Swords, Share2, Home, Medal, Crown, Award, User, Star } from 'lucide-react';
 import { leaderboardData, currentUser } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
@@ -33,10 +32,10 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col dotted-bg">
       {/* Header */}
-      <div className="p-6 text-center gradient-primary">
-        <Trophy className="w-12 h-12 mx-auto mb-3 text-primary-foreground animate-pulse-slow" />
+      <div className="p-6 text-center gradient-primary rounded-b-[2rem]">
+        <Trophy className="w-12 h-12 mx-auto mb-3 text-primary-foreground" />
         <h1 className="text-2xl font-extrabold text-primary-foreground">لوحة المتصدرين</h1>
         <p className="text-primary-foreground/80 mt-1">نتائج التحدي</p>
       </div>
@@ -47,45 +46,54 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
           {/* 2nd place */}
           {top3[1] && (
             <div className="flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-4 border-card shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-card flex items-center justify-center border-4 border-muted shadow-card">
                 <User className="w-8 h-8 text-muted-foreground" />
               </div>
               <div className="mt-1">{getRankIcon(2)}</div>
               <p className="font-bold text-foreground text-sm mt-1">{top3[1].name}</p>
-              <p className="text-xs text-muted-foreground">{top3[1].points} نقطة</p>
-              <div className="w-20 h-16 mt-2 rounded-t-lg bg-muted/50" />
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-muted-foreground">{top3[1].points}</span>
+                <Star className="w-3 h-3 text-warning fill-warning" />
+              </div>
+              <div className="w-20 h-16 mt-2 rounded-t-xl bg-muted/50" />
             </div>
           )}
 
           {/* 1st place */}
           {top3[0] && (
             <div className="flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center border-4 border-warning shadow-glow-primary">
+              <div className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center border-4 border-warning shadow-glow-primary">
                 <User className="w-10 h-10 text-primary-foreground" />
               </div>
               <div className="mt-1">{getRankIcon(1)}</div>
               <p className="font-bold text-foreground mt-1">{top3[0].name}</p>
-              <p className="text-sm text-primary font-bold">{top3[0].points} نقطة</p>
-              <div className="w-24 h-24 mt-2 rounded-t-lg gradient-primary/30" />
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-primary font-bold">{top3[0].points}</span>
+                <Star className="w-4 h-4 text-warning fill-warning" />
+              </div>
+              <div className="w-24 h-24 mt-2 rounded-t-xl gradient-primary/30" />
             </div>
           )}
 
           {/* 3rd place */}
           {top3[2] && (
             <div className="flex flex-col items-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center border-4 border-card shadow-lg">
+              <div className="w-16 h-16 rounded-2xl bg-card flex items-center justify-center border-4 border-secondary/30 shadow-card">
                 <User className="w-8 h-8 text-secondary" />
               </div>
               <div className="mt-1">{getRankIcon(3)}</div>
               <p className="font-bold text-foreground text-sm mt-1">{top3[2].name}</p>
-              <p className="text-xs text-muted-foreground">{top3[2].points} نقطة</p>
-              <div className="w-20 h-12 mt-2 rounded-t-lg bg-secondary/20" />
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-muted-foreground">{top3[2].points}</span>
+                <Star className="w-3 h-3 text-warning fill-warning" />
+              </div>
+              <div className="w-20 h-12 mt-2 rounded-t-xl bg-secondary/20" />
             </div>
           )}
         </div>
 
         {/* Your rank highlight */}
-        <div className="bg-card rounded-2xl p-4 shadow-card border-2 border-primary/30 mb-6 animate-scale-in">
+        <div className="bg-card rounded-3xl p-4 shadow-card mb-6 animate-scale-in ring-2 ring-primary/30">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
               <Medal className="w-6 h-6 text-primary-foreground" />
@@ -108,15 +116,15 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
               <div
                 key={item.id}
                 className={cn(
-                  'flex items-center gap-4 p-4 rounded-xl bg-card shadow-card animate-slide-up',
-                  item.id === currentUser.id && 'border-2 border-primary/30'
+                  'flex items-center gap-4 p-4 rounded-2xl bg-card shadow-card animate-slide-up',
+                  item.id === currentUser.id && 'ring-2 ring-primary/30'
                 )}
                 style={{ animationDelay: `${(index + 4) * 0.1}s` }}
               >
                 <span className="w-8 text-center font-bold text-muted-foreground">
                   {item.rank}
                 </span>
-                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
                   <User className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <span className="flex-1 font-medium text-foreground">{item.name}</span>
@@ -128,36 +136,26 @@ export function Leaderboard({ userScore, onNewChallenge, onHome }: LeaderboardPr
       </div>
 
       {/* Footer */}
-      <div className="mt-auto p-4 space-y-3 border-t border-border bg-card/50">
-        <Button
-          variant="secondary"
-          size="lg"
-          className="w-full"
+      <div className="mt-auto p-5 space-y-3">
+        <button
           onClick={onNewChallenge}
+          className="w-full py-4 rounded-2xl gradient-secondary text-secondary-foreground font-bold text-lg shadow-glow-secondary hover:opacity-95 transition-opacity active:scale-[0.98]"
         >
-          <Swords className="ml-2 w-5 h-5" />
-          تحدي جديد
-        </Button>
+          <div className="flex items-center justify-center gap-2">
+            <Swords className="w-5 h-5" />
+            تحدي جديد
+          </div>
+        </button>
 
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            size="lg"
-            className="flex-1"
-            onClick={onHome}
-          >
-            <Home className="ml-2 w-5 h-5" />
+        <button
+          onClick={onHome}
+          className="w-full py-4 rounded-2xl border-2 border-primary text-primary font-bold text-lg hover:bg-primary/5 transition-colors active:scale-[0.98]"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Home className="w-5 h-5" />
             الرئيسية
-          </Button>
-          <Button
-            variant="ghost"
-            size="lg"
-            className="flex-1"
-          >
-            <Share2 className="ml-2 w-5 h-5" />
-            مشاركة
-          </Button>
-        </div>
+          </div>
+        </button>
       </div>
     </div>
   );

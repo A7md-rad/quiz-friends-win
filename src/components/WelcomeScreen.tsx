@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { User, Users, LogIn, Gamepad2, Star, Rocket } from 'lucide-react';
+import { User, Users, Gamepad2, Star, Trophy } from 'lucide-react';
 import { currentUser } from '@/data/mockData';
 
 interface WelcomeScreenProps {
@@ -9,84 +9,69 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge }: WelcomeScreenProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-40 left-10 w-40 h-40 rounded-full bg-secondary/10 blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 right-1/4 w-24 h-24 rounded-full bg-accent/10 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
-      </div>
+    <div className="min-h-screen flex flex-col p-6 relative dotted-bg">
+      {/* Header with profile, points, and trophy */}
+      <div className="flex items-center justify-between mb-12">
+        {/* Profile button */}
+        <button className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center">
+          <User className="w-6 h-6 text-primary" />
+        </button>
 
-      {/* User points badge */}
-      <div className="absolute top-6 left-6 flex items-center gap-2 bg-card rounded-full px-4 py-2 shadow-card">
-        <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
-          <User className="w-5 h-5 text-primary-foreground" />
+        {/* Points badge */}
+        <div className="flex items-center gap-2 px-5 py-3 rounded-full gradient-secondary shadow-md">
+          <span className="text-lg font-bold text-secondary-foreground">{currentUser.points}</span>
+          <Star className="w-5 h-5 text-secondary-foreground fill-secondary-foreground" />
         </div>
-        <div className="flex flex-col">
-          <span className="text-sm font-medium text-foreground">{currentUser.name}</span>
-          <span className="text-xs text-primary font-bold flex items-center gap-1">
-            {currentUser.points} نقطة
-            <Star className="w-3 h-3 text-warning fill-warning animate-pulse-slow" />
-          </span>
-        </div>
+
+        {/* Trophy button */}
+        <button className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center">
+          <Trophy className="w-6 h-6 text-warning" />
+        </button>
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 text-center max-w-md mx-auto">
+      <div className="flex-1 flex flex-col items-center justify-center -mt-16">
         {/* Logo / App icon */}
-        <div className="mb-6 animate-float">
-          <div className="w-28 h-28 mx-auto rounded-3xl gradient-primary flex items-center justify-center shadow-glow-primary">
-            <Gamepad2 className="w-14 h-14 text-primary-foreground animate-wiggle" />
+        <div className="mb-8 animate-float">
+          <div className="w-36 h-36 rounded-[2rem] gradient-primary flex items-center justify-center shadow-glow-primary">
+            <Gamepad2 className="w-20 h-20 text-primary-foreground" />
           </div>
         </div>
 
         {/* App name */}
         <h1 className="text-4xl font-extrabold text-foreground mb-3">
-          لعب و<span className="text-gradient-primary">تعلّم</span>
+          لعب وتعلّم
         </h1>
 
         {/* Tagline */}
-        <p className="text-lg text-muted-foreground mb-10 flex items-center justify-center gap-2">
+        <p className="text-lg text-muted-foreground mb-12">
           تعلم باللعب ونافس أصدقاءك!
-          <Rocket className="w-5 h-5 text-secondary animate-bounce-gentle" />
         </p>
 
         {/* Main buttons */}
-        <div className="space-y-4">
-          <Button
-            variant="default"
-            size="xl"
-            className="w-full"
+        <div className="w-full max-w-sm space-y-4">
+          <button
             onClick={onSoloChallenge}
+            className="w-full py-5 px-8 rounded-2xl gradient-primary text-primary-foreground font-bold text-xl flex items-center justify-center gap-3 shadow-glow-primary hover:opacity-95 transition-opacity active:scale-[0.98]"
           >
-            <User className="ml-2" />
+            <Gamepad2 className="w-7 h-7" />
             تحدّى نفسك
-          </Button>
+          </button>
 
-          <Button
-            variant="secondary"
-            size="xl"
-            className="w-full"
+          <button
             onClick={onFriendsChallenge}
+            className="w-full py-5 px-8 rounded-2xl gradient-secondary text-secondary-foreground font-bold text-xl flex items-center justify-center gap-3 shadow-glow-secondary hover:opacity-95 transition-opacity active:scale-[0.98]"
           >
-            <Users className="ml-2" />
+            <Users className="w-7 h-7" />
             تحدّى أصدقائك
-          </Button>
+          </button>
         </div>
 
-        {/* Login button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-8 text-muted-foreground"
-        >
-          <LogIn className="ml-1 w-4 h-4" />
+        {/* Login link */}
+        <button className="mt-10 text-muted-foreground text-base hover:text-foreground transition-colors">
           تسجيل دخول / إنشاء حساب
-        </Button>
+        </button>
       </div>
-
-      {/* Bottom decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
     </div>
   );
 }

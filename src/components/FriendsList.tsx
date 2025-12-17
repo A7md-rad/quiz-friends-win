@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { ArrowRight, UserPlus, Swords, Check, User, Star } from 'lucide-react';
 import { friends, currentUser } from '@/data/mockData';
 import { Friend } from '@/types/app';
@@ -24,30 +23,33 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col dotted-bg">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowRight className="w-6 h-6" />
-          </Button>
+      <div className="p-5">
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <button 
+            onClick={onBack}
+            className="absolute right-5 w-12 h-12 rounded-xl flex items-center justify-center hover:bg-card/50 transition-colors"
+          >
+            <ArrowRight className="w-7 h-7 text-foreground" />
+          </button>
           <h1 className="text-2xl font-bold text-foreground">تحدّى أصدقائك</h1>
         </div>
       </div>
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 px-5">
         {/* My profile card */}
-        <div className="bg-card rounded-2xl p-4 shadow-card mb-6 border-2 border-primary/20">
+        <div className="bg-card rounded-3xl p-5 shadow-card mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center">
               <User className="w-7 h-7 text-primary-foreground" />
             </div>
             <div className="flex-1">
               <p className="font-bold text-foreground text-lg">{currentUser.name}</p>
-              <p className="text-primary font-semibold flex items-center gap-1">
-                {currentUser.points} نقطة
-                <Star className="w-4 h-4 text-warning fill-warning animate-pulse-slow" />
-              </p>
+              <div className="flex items-center gap-1">
+                <span className="text-secondary font-bold">{currentUser.points}</span>
+                <Star className="w-4 h-4 text-secondary fill-secondary" />
+              </div>
             </div>
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
               أنت
@@ -59,10 +61,10 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-foreground">أصدقائي</h2>
-            <Button variant="ghost" size="sm" className="text-primary">
-              <UserPlus className="ml-1 w-4 h-4" />
+            <button className="text-primary font-medium flex items-center gap-1">
+              <UserPlus className="w-4 h-4" />
               إضافة صديق
-            </Button>
+            </button>
           </div>
 
           {/* Friends list */}
@@ -75,11 +77,11 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
                   key={friend.id}
                   onClick={() => toggleFriend(friend)}
                   className={cn(
-                    'w-full bg-card rounded-xl p-4 shadow-card border-2 transition-all duration-300',
+                    'w-full bg-card rounded-2xl p-4 shadow-card transition-all duration-300',
                     'flex items-center gap-4 animate-slide-up',
                     isSelected 
-                      ? 'border-secondary bg-secondary/5' 
-                      : 'border-transparent hover:border-border'
+                      ? 'ring-2 ring-primary' 
+                      : 'hover:shadow-md'
                   )}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
@@ -87,11 +89,11 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
                   <div className="relative">
                     <div className={cn(
                       'w-12 h-12 rounded-xl flex items-center justify-center',
-                      isSelected ? 'bg-secondary/20' : 'bg-muted'
+                      isSelected ? 'gradient-primary' : 'bg-muted'
                     )}>
                       <User className={cn(
                         'w-6 h-6',
-                        isSelected ? 'text-secondary' : 'text-muted-foreground'
+                        isSelected ? 'text-primary-foreground' : 'text-muted-foreground'
                       )} />
                     </div>
                     {/* Online indicator */}
@@ -110,8 +112,8 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
                   <div className={cn(
                     'w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all',
                     isSelected 
-                      ? 'border-secondary bg-secondary text-secondary-foreground' 
-                      : 'border-border'
+                      ? 'border-primary bg-primary text-primary-foreground' 
+                      : 'border-muted-foreground/30'
                   )}>
                     {isSelected && <Check className="w-5 h-5" />}
                   </div>
@@ -123,17 +125,22 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
-        <Button
-          variant="secondary"
-          size="lg"
-          className="w-full"
+      <div className="p-5">
+        <button
           disabled={selectedFriends.length === 0}
           onClick={() => onCreateChallenge(selectedFriends)}
+          className={cn(
+            'w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.98]',
+            selectedFriends.length > 0
+              ? 'gradient-secondary text-secondary-foreground shadow-glow-secondary'
+              : 'bg-muted text-muted-foreground'
+          )}
         >
-          <Swords className="ml-2 w-5 h-5" />
-          إنشاء تحدي {selectedFriends.length > 0 && `(${selectedFriends.length})`}
-        </Button>
+          <div className="flex items-center justify-center gap-2">
+            <Swords className="w-5 h-5" />
+            إنشاء تحدي {selectedFriends.length > 0 && `(${selectedFriends.length})`}
+          </div>
+        </button>
       </div>
     </div>
   );
