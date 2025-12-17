@@ -7,6 +7,7 @@ import { FriendsList } from '@/components/FriendsList';
 import { ChallengeSetup } from '@/components/ChallengeSetup';
 import { Leaderboard } from '@/components/Leaderboard';
 import { ProfilePage } from '@/components/ProfilePage';
+import { AndroidStatusBar } from '@/components/AndroidStatusBar';
 import { Screen, Subject, Friend } from '@/types/app';
 import { friends } from '@/data/mockData';
 
@@ -152,9 +153,24 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-cairo">
-      <div className="max-w-md mx-auto min-h-screen shadow-2xl bg-background">
-        {renderScreen()}
+    <div className="min-h-screen bg-[#1a1a1a] font-cairo flex items-center justify-center p-4">
+      {/* Android Phone Frame */}
+      <div className="w-full max-w-[380px] h-[780px] bg-[#1a1a1a] rounded-[3rem] p-2 shadow-2xl border-4 border-[#333] relative overflow-hidden">
+        {/* Inner screen */}
+        <div className="w-full h-full bg-background rounded-[2.5rem] overflow-hidden flex flex-col">
+          {/* Status Bar */}
+          <AndroidStatusBar />
+          
+          {/* App Content */}
+          <div className="flex-1 overflow-auto">
+            {renderScreen()}
+          </div>
+          
+          {/* Android Navigation Bar */}
+          <div className="bg-[#1a1a1a] h-1 flex items-center justify-center pb-2 pt-1">
+            <div className="w-32 h-1 bg-white/50 rounded-full" />
+          </div>
+        </div>
       </div>
     </div>
   );
