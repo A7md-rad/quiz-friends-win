@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { WelcomeScreen } from '@/components/WelcomeScreen';
 import { SubjectSelection } from '@/components/SubjectSelection';
 import { QuizPage } from '@/components/QuizPage';
+import { MultiplayerQuiz } from '@/components/MultiplayerQuiz';
 import { QuizResult } from '@/components/QuizResult';
 import { FriendsList } from '@/components/FriendsList';
 import { ChallengeSetup } from '@/components/ChallengeSetup';
@@ -90,14 +91,21 @@ const Index = () => {
         );
 
       case 'quiz':
-      case 'challenge-quiz':
         return selectedSubject ? (
           <QuizPage
             subject={selectedSubject}
             onComplete={handleQuizComplete}
             onExit={goToWelcome}
-            isChallenge={isChallenge}
-            opponent={isChallenge ? selectedFriends[0] || friends[0] : undefined}
+          />
+        ) : null;
+
+      case 'challenge-quiz':
+        return selectedSubject ? (
+          <MultiplayerQuiz
+            subject={selectedSubject}
+            selectedFriends={selectedFriends.length > 0 ? selectedFriends : friends.slice(0, 2)}
+            onComplete={handleQuizComplete}
+            onExit={goToWelcome}
           />
         ) : null;
 
