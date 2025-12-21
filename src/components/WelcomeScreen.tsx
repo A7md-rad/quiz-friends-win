@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { User, Users, Gamepad2, Star, Trophy } from 'lucide-react';
 import { currentUser } from '@/data/mockData';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 interface WelcomeScreenProps {
   onSoloChallenge: () => void;
@@ -9,6 +11,16 @@ interface WelcomeScreenProps {
 }
 
 export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, onLeaderboard }: WelcomeScreenProps) {
+  const [code, setCode] = useState('');
+
+  const handleCodeComplete = (value: string) => {
+    setCode(value);
+    if (value.length === 4) {
+      // Handle code submission
+      console.log('Code entered:', value);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col p-6 relative dotted-bg">
       {/* Header with profile, points, and trophy */}
@@ -74,10 +86,22 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
           </button>
         </div>
 
-        {/* Login link */}
-        <button className="mt-10 text-muted-foreground text-base hover:text-foreground transition-colors">
-          تسجيل دخول / إنشاء حساب
-        </button>
+        {/* Code input section */}
+        <div className="mt-10 flex flex-col items-center gap-3">
+          <p className="text-muted-foreground text-base">أدخل كود الانضمام</p>
+          <InputOTP
+            maxLength={4}
+            value={code}
+            onChange={handleCodeComplete}
+          >
+            <InputOTPGroup className="gap-2">
+              <InputOTPSlot index={0} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
+              <InputOTPSlot index={1} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
+              <InputOTPSlot index={2} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
+              <InputOTPSlot index={3} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
       </div>
     </div>
   );
