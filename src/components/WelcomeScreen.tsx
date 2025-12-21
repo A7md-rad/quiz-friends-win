@@ -87,18 +87,18 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
         </div>
 
         {/* Code input section */}
-        <div className="mt-10 flex flex-col items-center gap-3">
-          <p className="text-muted-foreground text-base">أدخل كود الانضمام</p>
+        <div className="mt-8 flex flex-col items-center gap-2">
+          <p className="text-muted-foreground text-sm">أدخل كود الانضمام</p>
           <InputOTP
             maxLength={4}
             value={code}
             onChange={handleCodeComplete}
           >
-            <InputOTPGroup className="gap-2">
-              <InputOTPSlot index={0} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
-              <InputOTPSlot index={1} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
-              <InputOTPSlot index={2} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
-              <InputOTPSlot index={3} className="w-14 h-14 text-2xl font-bold rounded-xl border-2 border-border bg-card" />
+            <InputOTPGroup className="gap-1">
+              <InputOTPSlot index={0} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
+              <InputOTPSlot index={1} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
+              <InputOTPSlot index={2} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
+              <InputOTPSlot index={3} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
             </InputOTPGroup>
           </InputOTP>
         </div>
