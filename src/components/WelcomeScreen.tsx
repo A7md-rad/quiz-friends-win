@@ -49,7 +49,7 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center -mt-16">
+      <div className="flex-1 flex flex-col items-center justify-center -mt-8">
         {/* Logo / App icon */}
         <div className="mb-8 animate-float">
           <div className="w-36 h-36 rounded-[2rem] gradient-primary flex items-center justify-center shadow-glow-primary">
