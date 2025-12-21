@@ -87,7 +87,7 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
         </div>
 
         {/* Code input section */}
-        <div className="mt-8 flex flex-col items-center gap-2">
+        <div className="mt-14 flex flex-col items-center gap-2">
           <p className="text-muted-foreground text-sm">أدخل كود الانضمام</p>
           <InputOTP
             maxLength={4}
