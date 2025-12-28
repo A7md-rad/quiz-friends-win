@@ -4,6 +4,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { isValidGameCode } from '@/utils/gameUtils';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JoinGameProps {
   onBack: () => void;
@@ -26,11 +27,27 @@ export function JoinGame({ onBack, onJoinSuccess }: JoinGameProps) {
 
     setIsJoining(true);
     
-    // محاكاة الانضمام (بدون باك إند)
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // التحقق من وجود اللعبة في قاعدة البيانات
+    const { data: game, error } = await supabase
+      .from('games')
+      .select('*')
+      .eq('code', code)
+      .eq('status', 'waiting')
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking game:', error);
+      toast.error('حدث خطأ في البحث عن اللعبة');
+      setIsJoining(false);
+      return;
+    }
+
+    if (!game) {
+      toast.error('كود اللعبة غير موجود أو اللعبة بدأت بالفعل');
+      setIsJoining(false);
+      return;
+    }
     
-    // في الواقع، هنا سنتحقق من وجود اللعبة في قاعدة البيانات
-    // لكن حالياً سننتقل مباشرة للعبة
     toast.success('تم الانضمام للعبة! جاري انتظار اختيار صاحب اللعبة للمادة...');
     onJoinSuccess(code);
   };
