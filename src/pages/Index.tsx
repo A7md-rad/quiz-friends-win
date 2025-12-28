@@ -140,11 +140,22 @@ const Index = () => {
     setCurrentScreen("join-waiting-room");
   };
 
-  const handleJoinGameStart = () => {
-    // محاكاة بدء اللعبة من المضيف
-    // في الواقع سيتم تحديد المادة من الخادم
-    const mockSubject: Subject = { id: 'math', name: 'رياضيات', icon: 'calculator', color: 'primary', questionsCount: 50 };
-    setSelectedSubject(mockSubject);
+  const handleJoinGameStart = (gameData: any) => {
+    // بدء اللعبة مع البيانات من قاعدة البيانات
+    const subject: Subject = { 
+      id: gameData.subject_id, 
+      name: gameData.subject_name, 
+      icon: 'book', 
+      color: 'primary', 
+      questionsCount: 50 
+    };
+    setSelectedSubject(subject);
+    setGameSettings(prev => ({
+      ...prev,
+      questionCount: gameData.question_count,
+      difficulty: gameData.difficulty,
+      timePerQuestion: gameData.time_per_question
+    }));
     setCurrentScreen("challenge-quiz");
   };
   
@@ -256,6 +267,9 @@ const Index = () => {
             questionCount={gameSettings.questionCount}
             maxPlayers={gameSettings.maxPlayers}
             isHost={gameSettings.isHost}
+            hostName={userName || 'مضيف'}
+            difficulty={gameSettings.difficulty}
+            timePerQuestion={gameSettings.timePerQuestion}
             onBack={goToGameModeSelection}
             onStartGame={handleWaitingRoomStart}
           />
@@ -265,6 +279,7 @@ const Index = () => {
         return (
           <JoinWaitingRoom
             gameCode={gameSettings.code}
+            playerName={userName || 'لاعب'}
             onBack={goToGameModeSelection}
             onGameStart={handleJoinGameStart}
           />
