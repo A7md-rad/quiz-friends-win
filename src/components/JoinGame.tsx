@@ -31,7 +31,7 @@ export function JoinGame({ onBack, onJoinSuccess }: JoinGameProps) {
     
     // في الواقع، هنا سنتحقق من وجود اللعبة في قاعدة البيانات
     // لكن حالياً سننتقل مباشرة للعبة
-    toast.success('تم الانضمام للعبة!');
+    toast.success('تم الانضمام للعبة! جاري انتظار اختيار صاحب اللعبة للمادة...');
     onJoinSuccess(code);
   };
 
