@@ -3,6 +3,7 @@ import { ArrowRight, Users, Play, Crown, Loader2, Copy, Check } from 'lucide-rea
 import { Subject } from '@/types/app';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Player {
   id: string;
@@ -16,6 +17,9 @@ interface WaitingRoomProps {
   questionCount: number;
   maxPlayers: number;
   isHost: boolean;
+  hostName: string;
+  difficulty: string;
+  timePerQuestion: number;
   onBack: () => void;
   onStartGame: (players: Player[]) => void;
 }
@@ -26,16 +30,148 @@ export function WaitingRoom({
   questionCount, 
   maxPlayers, 
   isHost,
+  hostName,
+  difficulty,
+  timePerQuestion,
   onBack, 
   onStartGame 
 }: WaitingRoomProps) {
-  const [players, setPlayers] = useState<Player[]>([
-    { id: '1', name: 'أنت', isHost: isHost }
-  ]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [copied, setCopied] = useState(false);
+  const [gameId, setGameId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // سيتم إضافة اللاعبين الحقيقيين عند ربط قاعدة البيانات
-  // حالياً اللعبة تعمل محلياً فقط
+  // إنشاء اللعبة في قاعدة البيانات عند تحميل الصفحة
+  useEffect(() => {
+    const createGame = async () => {
+      try {
+        // إنشاء اللعبة
+        const { data: game, error: gameError } = await (supabase as any)
+          .from('games')
+          .insert({
+            code: gameCode,
+            host_name: hostName,
+            subject_id: subject.id,
+            subject_name: subject.name,
+            question_count: questionCount,
+            max_players: maxPlayers,
+            difficulty: difficulty,
+            time_per_question: timePerQuestion,
+            status: 'waiting'
+          })
+          .select()
+          .single();
+
+        if (gameError) {
+          console.error('Error creating game:', gameError);
+          toast.error('حدث خطأ في إنشاء اللعبة');
+          return;
+        }
+
+        setGameId(game.id);
+
+        // إضافة المضيف كلاعب
+        const { error: playerError } = await (supabase as any)
+          .from('game_players')
+          .insert({
+            game_id: game.id,
+            name: hostName,
+            is_host: true,
+            is_ready: true
+          });
+
+        if (playerError) {
+          console.error('Error adding host as player:', playerError);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error in createGame:', error);
+        toast.error('حدث خطأ غير متوقع');
+        setIsLoading(false);
+      }
+    };
+
+    createGame();
+  }, [gameCode, hostName, subject, questionCount, maxPlayers, difficulty, timePerQuestion]);
+
+  // الاستماع للاعبين في الوقت الحقيقي
+  useEffect(() => {
+    if (!gameId) return;
+
+    // جلب اللاعبين الحاليين
+    const fetchPlayers = async () => {
+      const { data, error } = await (supabase as any)
+        .from('game_players')
+        .select('*')
+        .eq('game_id', gameId);
+
+      if (error) {
+        console.error('Error fetching players:', error);
+        return;
+      }
+
+      setPlayers(data.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        isHost: p.is_host
+      })));
+    };
+
+    fetchPlayers();
+
+    // الاستماع للتغييرات في الوقت الحقيقي
+    const channel = supabase
+      .channel(`game-${gameId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'game_players',
+          filter: `game_id=eq.${gameId}`
+        },
+        (payload: any) => {
+          console.log('Player change:', payload);
+          if (payload.eventType === 'INSERT') {
+            const newPlayer = payload.new;
+            setPlayers(prev => {
+              if (prev.some(p => p.id === newPlayer.id)) return prev;
+              toast.success(`${newPlayer.name} انضم للعبة!`);
+              return [...prev, {
+                id: newPlayer.id,
+                name: newPlayer.name,
+                isHost: newPlayer.is_host
+              }];
+            });
+          } else if (payload.eventType === 'DELETE') {
+            setPlayers(prev => prev.filter(p => p.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [gameId]);
+
+  // تنظيف عند الخروج
+  const handleBack = async () => {
+    if (gameId) {
+      // حذف اللعبة واللاعبين
+      await (supabase as any)
+        .from('game_players')
+        .delete()
+        .eq('game_id', gameId);
+      
+      await (supabase as any)
+        .from('games')
+        .delete()
+        .eq('id', gameId);
+    }
+    onBack();
+  };
 
   const handleCopyCode = async () => {
     try {
@@ -48,22 +184,40 @@ export function WaitingRoom({
     }
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (players.length < 2) {
       toast.error('انتظر انضمام لاعب آخر على الأقل');
       return;
     }
+
+    if (gameId) {
+      // تحديث حالة اللعبة إلى "started"
+      await (supabase as any)
+        .from('games')
+        .update({ status: 'started' })
+        .eq('id', gameId);
+    }
+
     onStartGame(players);
   };
 
   const canStart = isHost && players.length >= 2;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 dotted-bg">
+        <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+        <p className="text-foreground font-bold">جاري إنشاء اللعبة...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col p-6 dotted-bg">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={onBack}
+          onClick={handleBack}
           className="w-12 h-12 rounded-2xl bg-card shadow-card flex items-center justify-center hover:shadow-md transition-shadow active:scale-95"
         >
           <ArrowRight className="w-6 h-6 text-foreground" />
@@ -137,7 +291,7 @@ export function WaitingRoom({
             >
               <div className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg relative",
-                player.id === '1' ? "gradient-primary text-primary-foreground" : "gradient-secondary text-secondary-foreground"
+                player.isHost ? "gradient-primary text-primary-foreground" : "gradient-secondary text-secondary-foreground"
               )}>
                 {player.name.charAt(0)}
                 {player.isHost && (
