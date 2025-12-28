@@ -45,6 +45,20 @@ export function WaitingRoom({
   useEffect(() => {
     const createGame = async () => {
       try {
+        // تسجيل دخول مجهول للحصول على session_id
+        let sessionId: string | undefined;
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          const { data: anonData, error: anonError } = await supabase.auth.signInAnonymously();
+          if (anonError) {
+            console.error('Error signing in anonymously:', anonError);
+          }
+          sessionId = anonData?.user?.id;
+        } else {
+          sessionId = session.user.id;
+        }
+
         // إنشاء اللعبة
         const { data: game, error: gameError } = await (supabase as any)
           .from('games')
@@ -57,7 +71,8 @@ export function WaitingRoom({
             max_players: maxPlayers,
             difficulty: difficulty,
             time_per_question: timePerQuestion,
-            status: 'waiting'
+            status: 'waiting',
+            host_session_id: sessionId
           })
           .select()
           .single();
@@ -77,7 +92,8 @@ export function WaitingRoom({
             game_id: game.id,
             name: hostName,
             is_host: true,
-            is_ready: true
+            is_ready: true,
+            session_id: sessionId
           });
 
         if (playerError) {

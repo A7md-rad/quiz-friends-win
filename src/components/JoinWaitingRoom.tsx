@@ -48,6 +48,20 @@ export function JoinWaitingRoom({ gameCode, playerName, onBack, onGameStart }: J
   useEffect(() => {
     const joinGame = async () => {
       try {
+        // تسجيل دخول مجهول للحصول على session_id
+        let sessionId: string | undefined;
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          const { data: anonData, error: anonError } = await supabase.auth.signInAnonymously();
+          if (anonError) {
+            console.error('Error signing in anonymously:', anonError);
+          }
+          sessionId = anonData?.user?.id;
+        } else {
+          sessionId = session.user.id;
+        }
+
         // البحث عن اللعبة
         const { data: game, error: gameError } = await (supabase as any)
           .from('games')
@@ -91,7 +105,8 @@ export function JoinWaitingRoom({ gameCode, playerName, onBack, onGameStart }: J
             game_id: game.id,
             name: playerName,
             is_host: false,
-            is_ready: true
+            is_ready: true,
+            session_id: sessionId
           })
           .select()
           .single();
