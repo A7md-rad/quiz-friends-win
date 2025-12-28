@@ -21,21 +21,7 @@ export function JoinWaitingRoom({ gameCode, onBack, onGameStart }: JoinWaitingRo
   ]);
   const [waitingDots, setWaitingDots] = useState('.');
 
-  // Simulate players joining
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (players.length < 4 && Math.random() > 0.7) {
-        const newPlayer: Player = {
-          id: `player-${players.length}`,
-          name: `لاعب ${players.length}`,
-          isHost: false,
-        };
-        setPlayers(prev => [...prev, newPlayer]);
-      }
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [players.length]);
+  // سيتم تحديث اللاعبين عند ربط قاعدة البيانات
 
   // Animate waiting dots
   useEffect(() => {
@@ -46,14 +32,7 @@ export function JoinWaitingRoom({ gameCode, onBack, onGameStart }: JoinWaitingRo
     return () => clearInterval(interval);
   }, []);
 
-  // Simulate game start after some time
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      onGameStart();
-    }, 8000);
-
-    return () => clearTimeout(timeout);
-  }, [onGameStart]);
+  // سيتم بدء اللعبة عند ربط قاعدة البيانات والاستماع لأحداث المضيف
 
   return (
     <div className="min-h-screen flex flex-col p-6 dotted-bg">
