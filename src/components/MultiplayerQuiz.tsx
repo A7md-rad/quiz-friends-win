@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Crown, Clock } from 'lucide-react';
+import { X, Check, Crown, Clock, Volume2, VolumeX } from 'lucide-react';
 import { Subject, Question, Friend } from '@/types/app';
 import { sampleQuestions } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
+import { playCountdownBeep, playTimeUpSound, playCorrectSound, playWrongSound } from '@/utils/soundEffects';
 
 interface Player {
   id: string;
@@ -48,6 +49,8 @@ export function MultiplayerQuiz({
   const [timer, setTimer] = useState(10);
   const [userAnswer, setUserAnswer] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const lastPlayedSecond = useRef<number>(0);
 
   const currentQ = questions[currentQuestion];
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -100,23 +103,39 @@ export function MultiplayerQuiz({
     setPlayers(allPlayers);
   }, [selectedFriends, gamePlayers, maxPlayers]);
 
-  // Timer countdown
+  // Timer countdown with sound effects
   useEffect(() => {
     if (phase !== 'answering') return;
     
     const interval = setInterval(() => {
       setTimer(prev => {
-        if (prev <= 1) {
+        const newTimer = prev - 1;
+        
+        // تشغيل صوت العد التنازلي
+        if (soundEnabled && newTimer <= 3 && newTimer > 0 && newTimer !== lastPlayedSecond.current) {
+          lastPlayedSecond.current = newTimer;
+          playCountdownBeep(newTimer);
+        }
+        
+        if (newTimer <= 0) {
           // Time's up - show results
+          if (soundEnabled) {
+            playTimeUpSound();
+          }
           handleTimeUp();
           return 10;
         }
-        return prev - 1;
+        return newTimer;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [phase, currentQuestion]);
+  }, [phase, currentQuestion, soundEnabled]);
+
+  // Reset last played second when question changes
+  useEffect(() => {
+    lastPlayedSecond.current = 0;
+  }, [currentQuestion]);
 
   // Simulate opponents answering
   useEffect(() => {
@@ -179,7 +198,7 @@ export function MultiplayerQuiz({
     }
   };
 
-  // Calculate scores when showing results
+  // Calculate scores when showing results and play sound
   useEffect(() => {
     if (phase === 'results') {
       setPlayers(prev => prev.map(p => {
@@ -191,6 +210,13 @@ export function MultiplayerQuiz({
       
       if (userAnswer === currentQ.correctAnswer) {
         setCorrectCount(prev => prev + 1);
+        if (soundEnabled) {
+          playCorrectSound();
+        }
+      } else if (userAnswer !== null) {
+        if (soundEnabled) {
+          playWrongSound();
+        }
       }
     }
   }, [phase]);
@@ -237,6 +263,18 @@ export function MultiplayerQuiz({
             <span className="text-sm text-muted-foreground">السؤال</span>
             <div className="text-xl font-bold text-primary">{currentQuestion + 1}/{questions.length}</div>
           </div>
+
+          {/* Sound toggle */}
+          <button 
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-muted/50 transition-colors"
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-5 h-5 text-primary" />
+            ) : (
+              <VolumeX className="w-5 h-5 text-muted-foreground" />
+            )}
+          </button>
 
           {/* Close button */}
           <button 
