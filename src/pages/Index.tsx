@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { SubjectSelection } from "@/components/SubjectSelection";
+import { SoloSetup } from "@/components/SoloSetup";
 import { QuizPage } from "@/components/QuizPage";
 import { MultiplayerQuiz } from "@/components/MultiplayerQuiz";
 import { QuizResult } from "@/components/QuizResult";
@@ -40,6 +41,9 @@ const Index = () => {
   // Players from waiting room
   const [gamePlayers, setGamePlayers] = useState<{id: string; name: string; isHost: boolean}[]>([]);
   
+  // Solo quiz settings
+  const [soloQuestionCount, setSoloQuestionCount] = useState(10);
+  
   // User state
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem('userName') || '';
@@ -70,9 +74,19 @@ const Index = () => {
     setCurrentScreen("subject-selection");
   };
 
+  const goToSoloSetup = (subject: Subject) => {
+    setSelectedSubject(subject);
+    setCurrentScreen("solo-setup");
+  };
+
+  const handleSoloStart = (questionCount: number) => {
+    setSoloQuestionCount(questionCount);
+    setCurrentScreen("quiz");
+  };
+
   const goToQuiz = (subject: Subject) => {
     setSelectedSubject(subject);
-    setCurrentScreen(isChallenge ? "challenge-quiz" : "quiz");
+    setCurrentScreen(isChallenge ? "challenge-quiz" : "solo-setup");
   };
 
   const goToGameModeSelection = () => {
@@ -191,9 +205,23 @@ const Index = () => {
           />
         );
 
+      case "solo-setup":
+        return selectedSubject ? (
+          <SoloSetup
+            subject={selectedSubject}
+            onBack={() => setCurrentScreen("subject-selection")}
+            onStart={handleSoloStart}
+          />
+        ) : null;
+
       case "quiz":
         return selectedSubject ? (
-          <QuizPage subject={selectedSubject} onComplete={handleQuizComplete} onExit={goToWelcome} />
+          <QuizPage 
+            subject={selectedSubject} 
+            questionCount={soloQuestionCount}
+            onComplete={handleQuizComplete} 
+            onExit={goToWelcome} 
+          />
         ) : null;
 
       case "waiting-room":
