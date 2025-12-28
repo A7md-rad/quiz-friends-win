@@ -8,6 +8,9 @@ import { FriendsList } from "@/components/FriendsList";
 import { ChallengeSetup } from "@/components/ChallengeSetup";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ProfilePage } from "@/components/ProfilePage";
+import { GameModeSelection } from "@/components/GameModeSelection";
+import { CreateGame } from "@/components/CreateGame";
+import { JoinGame } from "@/components/JoinGame";
 import { AndroidStatusBar } from "@/components/AndroidStatusBar";
 import { Screen, Subject, Friend } from "@/types/app";
 import { friends } from "@/data/mockData";
@@ -35,6 +38,35 @@ const Index = () => {
   const goToQuiz = (subject: Subject) => {
     setSelectedSubject(subject);
     setCurrentScreen(isChallenge ? "challenge-quiz" : "quiz");
+  };
+
+  const goToGameModeSelection = () => {
+    setCurrentScreen("game-mode-selection");
+  };
+
+  const goToCreateGame = () => {
+    setCurrentScreen("create-game");
+  };
+
+  const goToJoinGame = () => {
+    setCurrentScreen("join-game");
+  };
+
+  const handleCreateGameStart = (subject: Subject, questionCount: number) => {
+    setSelectedSubject(subject);
+    setIsChallenge(true);
+    // محاكاة: اختيار أصدقاء عشوائيين للعبة
+    setSelectedFriends(friends.slice(0, 2));
+    setCurrentScreen("challenge-quiz");
+  };
+
+  const handleJoinSuccess = (code: string) => {
+    // محاكاة: الانضمام للعبة بناءً على الكود
+    // في الواقع، سنحصل على بيانات اللعبة من السيرفر
+    setIsChallenge(true);
+    setSelectedFriends(friends.slice(0, 2));
+    // نذهب لاختيار المادة مؤقتاً (في الواقع ستكون محددة مسبقاً)
+    setCurrentScreen("subject-selection");
   };
 
   const goToFriendsList = () => {
@@ -75,9 +107,35 @@ const Index = () => {
         return (
           <WelcomeScreen
             onSoloChallenge={() => goToSubjectSelection(false)}
-            onFriendsChallenge={goToFriendsList}
+            onFriendsChallenge={goToGameModeSelection}
             onProfile={goToProfile}
             onLeaderboard={goToLeaderboard}
+            onJoinWithCode={handleJoinSuccess}
+          />
+        );
+
+      case "game-mode-selection":
+        return (
+          <GameModeSelection
+            onCreateGame={goToCreateGame}
+            onJoinGame={goToJoinGame}
+            onBack={goToWelcome}
+          />
+        );
+
+      case "create-game":
+        return (
+          <CreateGame
+            onBack={goToGameModeSelection}
+            onStartGame={handleCreateGameStart}
+          />
+        );
+
+      case "join-game":
+        return (
+          <JoinGame
+            onBack={goToGameModeSelection}
+            onJoinSuccess={handleJoinSuccess}
           />
         );
 
@@ -132,7 +190,7 @@ const Index = () => {
 
       case "leaderboard":
         return (
-          <Leaderboard userScore={quizResult.score || 160} onNewChallenge={goToFriendsList} onHome={goToWelcome} />
+          <Leaderboard userScore={quizResult.score || 160} onNewChallenge={goToGameModeSelection} onHome={goToWelcome} />
         );
 
       case "profile":
@@ -142,9 +200,10 @@ const Index = () => {
         return (
           <WelcomeScreen
             onSoloChallenge={() => goToSubjectSelection(false)}
-            onFriendsChallenge={goToFriendsList}
+            onFriendsChallenge={goToGameModeSelection}
             onProfile={goToProfile}
             onLeaderboard={goToLeaderboard}
+            onJoinWithCode={handleJoinSuccess}
           />
         );
     }

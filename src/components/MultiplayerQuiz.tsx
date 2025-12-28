@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Star, Crown, Clock, User } from 'lucide-react';
+import { X, Check, Star, Crown, Clock } from 'lucide-react';
 import { Subject, Question } from '@/types/app';
 import { sampleQuestions, currentUser, friends } from '@/data/mockData';
+import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 
 interface Player {
@@ -22,7 +23,12 @@ interface MultiplayerQuizProps {
 }
 
 export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }: MultiplayerQuizProps) {
-  const questions = sampleQuestions[subject.id] || sampleQuestions.math;
+  // خلط الأسئلة عند بدء اللعبة
+  const questions = useMemo(() => {
+    const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
+    return shuffleQuestions(originalQuestions);
+  }, [subject.id]);
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
   const [phase, setPhase] = useState<'answering' | 'results'>('answering');
@@ -64,7 +70,7 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
   useEffect(() => {
     if (phase !== 'answering') return;
 
-    selectedFriends.forEach((friend, index) => {
+    selectedFriends.forEach((friend) => {
       const delay = 2000 + Math.random() * 5000; // 2-7 seconds
       const timeout = setTimeout(() => {
         if (phase === 'answering') {
@@ -198,7 +204,7 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
       {/* Players status */}
       <div className="px-4 py-3">
         <div className="flex items-center justify-center gap-3 flex-wrap">
-          {players.map((player, index) => (
+          {players.map((player) => (
             <div 
               key={player.id}
               className={cn(

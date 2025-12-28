@@ -7,7 +7,12 @@ export type Screen =
   | 'challenge-setup' 
   | 'challenge-quiz'
   | 'leaderboard'
-  | 'profile';
+  | 'profile'
+  | 'game-mode-selection'
+  | 'create-game'
+  | 'join-game';
+
+export type GameMode = 'create' | 'join';
 
 export interface User {
   id: string;
@@ -47,4 +52,14 @@ export interface ChallengeSetup {
   subject: Subject | null;
   questionCount: number;
   selectedFriends: Friend[];
+}
+
+export interface GameSession {
+  code: string;
+  subject: Subject | null;
+  questionCount: number;
+  maxPlayers: number;
+  hostId: string;
+  players: User[];
+  status: 'waiting' | 'playing' | 'finished';
 }

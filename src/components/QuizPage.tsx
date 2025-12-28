@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Star, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, User, Sparkles, type LucideIcon } from 'lucide-react';
+import { X, Check, Star, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Sparkles, type LucideIcon } from 'lucide-react';
 import { Subject, Question, QuizState } from '@/types/app';
 import { sampleQuestions, currentUser, friends } from '@/data/mockData';
+import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 
 interface QuizPageProps {
@@ -23,7 +24,12 @@ const subjectIconMap: Record<string, LucideIcon> = {
 };
 
 export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opponent }: QuizPageProps) {
-  const questions = sampleQuestions[subject.id] || sampleQuestions.math;
+  // خلط الأسئلة عند بدء اللعبة
+  const questions = useMemo(() => {
+    const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
+    return shuffleQuestions(originalQuestions);
+  }, [subject.id]);
+
   const [state, setState] = useState<QuizState>({
     currentQuestion: 0,
     score: 0,
@@ -33,25 +39,9 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [opponentScore, setOpponentScore] = useState(0);
 
   const currentQ = questions[state.currentQuestion];
   const progress = ((state.currentQuestion + 1) / questions.length) * 100;
-
-  // Simulate opponent score in challenge mode
-  useEffect(() => {
-    if (isChallenge && opponent) {
-      const interval = setInterval(() => {
-        setOpponentScore(prev => {
-          if (prev < state.score + 20) {
-            return prev + Math.floor(Math.random() * 15);
-          }
-          return prev;
-        });
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [isChallenge, opponent, state.score]);
 
   const handleSelectAnswer = (answerIndex: number) => {
     if (showFeedback) return;
