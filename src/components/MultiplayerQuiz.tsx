@@ -364,12 +364,12 @@ export function MultiplayerQuiz({
             const isSelected = userAnswer === index;
             const isCorrectAnswer = index === currentQ.correctAnswer;
             const showCorrect = phase === 'results' && isCorrectAnswer;
-            const showWrong = phase === 'results' && isSelected && !isCorrectAnswer;
+            const showWrong = phase === 'results' && isSelected && !isCorrectAnswer && userAnswer !== null;
             const letter = String.fromCharCode(65 + index);
             
-            // Count who answered this option
+            // Count who answered this option (exclude user if they didn't answer)
             const playersWithThisAnswer = phase === 'results' 
-              ? players.filter(p => p.currentAnswer === index)
+              ? players.filter(p => p.currentAnswer === index && (p.id !== '1' || userAnswer !== null))
               : [];
 
             return (
