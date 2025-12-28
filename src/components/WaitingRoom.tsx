@@ -34,38 +34,8 @@ export function WaitingRoom({
   ]);
   const [copied, setCopied] = useState(false);
 
-  // محاكاة انضمام لاعبين
-  useEffect(() => {
-    if (!isHost) return;
-    
-    const fakeNames = ['أحمد', 'محمد', 'سارة', 'فاطمة', 'علي'];
-    let currentIndex = 0;
-
-    const addPlayer = () => {
-      if (players.length >= maxPlayers) return;
-      
-      const newPlayer: Player = {
-        id: `player_${Date.now()}`,
-        name: fakeNames[currentIndex % fakeNames.length],
-        isHost: false
-      };
-      
-      setPlayers(prev => {
-        if (prev.length >= maxPlayers) return prev;
-        return [...prev, newPlayer];
-      });
-      
-      toast.success(`${fakeNames[currentIndex % fakeNames.length]} انضم للعبة!`);
-      currentIndex++;
-    };
-
-    // إضافة لاعب بعد 2-4 ثواني
-    const timeout = setTimeout(() => {
-      addPlayer();
-    }, 2000 + Math.random() * 2000);
-
-    return () => clearTimeout(timeout);
-  }, [isHost, players.length, maxPlayers]);
+  // سيتم إضافة اللاعبين الحقيقيين عند ربط قاعدة البيانات
+  // حالياً اللعبة تعمل محلياً فقط
 
   const handleCopyCode = async () => {
     try {
