@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { ArrowRight, HelpCircle, Play, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, type LucideIcon } from 'lucide-react';
-import { Subject } from '@/types/app';
+import { ArrowRight, HelpCircle, Play, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Zap, type LucideIcon } from 'lucide-react';
+import { Subject, Difficulty } from '@/types/app';
 import { cn } from '@/lib/utils';
 
 interface SoloSetupProps {
   subject: Subject;
   onBack: () => void;
-  onStart: (questionCount: number) => void;
+  onStart: (questionCount: number, difficulty: Difficulty) => void;
 }
 
 const subjectIconMap: Record<string, LucideIcon> = {
@@ -20,8 +20,15 @@ const subjectIconMap: Record<string, LucideIcon> = {
 
 const questionCountOptions = [5, 10, 15];
 
+const difficultyOptions: { value: Difficulty; label: string; color: string }[] = [
+  { value: 'easy', label: 'سهل', color: 'bg-green-500' },
+  { value: 'medium', label: 'متوسط', color: 'bg-yellow-500' },
+  { value: 'hard', label: 'صعب', color: 'bg-red-500' },
+];
+
 export function SoloSetup({ subject, onBack, onStart }: SoloSetupProps) {
   const [questionCount, setQuestionCount] = useState(10);
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
 
   const IconComponent = subjectIconMap[subject.icon] || BookOpen;
 
@@ -48,7 +55,7 @@ export function SoloSetup({ subject, onBack, onStart }: SoloSetupProps) {
       </div>
 
       {/* Question Count */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
           <HelpCircle className="w-5 h-5 text-primary" />
           عدد الأسئلة
@@ -71,12 +78,37 @@ export function SoloSetup({ subject, onBack, onStart }: SoloSetupProps) {
         </div>
       </div>
 
+      {/* Difficulty Selection */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+          <Zap className="w-5 h-5 text-primary" />
+          مستوى الصعوبة
+        </h2>
+        <div className="flex gap-3">
+          {difficultyOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setDifficulty(option.value)}
+              className={cn(
+                'flex-1 py-5 rounded-2xl font-bold text-lg transition-all active:scale-95 flex flex-col items-center gap-2',
+                difficulty === option.value
+                  ? 'gradient-primary text-primary-foreground shadow-glow-primary'
+                  : 'bg-card shadow-card hover:shadow-md text-foreground'
+              )}
+            >
+              <div className={cn('w-3 h-3 rounded-full', option.color)} />
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Spacer */}
       <div className="flex-1" />
 
       {/* Start Button */}
       <button
-        onClick={() => onStart(questionCount)}
+        onClick={() => onStart(questionCount, difficulty)}
         className="w-full py-5 rounded-2xl font-bold text-xl flex items-center justify-center gap-3 gradient-primary text-primary-foreground shadow-glow-primary transition-all active:scale-[0.98]"
       >
         <Play className="w-6 h-6" />
