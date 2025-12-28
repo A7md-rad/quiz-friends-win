@@ -2,22 +2,30 @@ import { useState } from 'react';
 import { User, Users, Gamepad2, Star, Trophy } from 'lucide-react';
 import { currentUser } from '@/data/mockData';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { isValidGameCode } from '@/utils/gameUtils';
+import { toast } from 'sonner';
 
 interface WelcomeScreenProps {
   onSoloChallenge: () => void;
   onFriendsChallenge: () => void;
   onProfile?: () => void;
   onLeaderboard?: () => void;
+  onJoinWithCode?: (code: string) => void;
 }
 
-export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, onLeaderboard }: WelcomeScreenProps) {
+export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, onLeaderboard, onJoinWithCode }: WelcomeScreenProps) {
   const [code, setCode] = useState('');
 
   const handleCodeComplete = (value: string) => {
     setCode(value);
-    if (value.length === 4) {
-      // Handle code submission
-      console.log('Code entered:', value);
+    if (value.length === 4 && isValidGameCode(value)) {
+      // الانضمام للعبة مباشرة عند إكمال الكود
+      if (onJoinWithCode) {
+        toast.success('جاري الانضمام للعبة...');
+        setTimeout(() => {
+          onJoinWithCode(value);
+        }, 500);
+      }
     }
   };
 
