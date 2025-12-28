@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Check, Crown, Clock, Volume2, VolumeX } from 'lucide-react';
-import { Subject, Question, Friend } from '@/types/app';
-import { sampleQuestions } from '@/data/mockData';
-import { shuffleQuestions } from '@/utils/gameUtils';
+import { Subject, Question, Friend, Difficulty } from '@/types/app';
+import { getQuestionsByDifficulty } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { playCountdownBeep, playTimeUpSound, playCorrectSound, playWrongSound } from '@/utils/soundEffects';
 
@@ -21,6 +20,7 @@ interface MultiplayerQuizProps {
   selectedFriends: Friend[];
   questionCount?: number;
   maxPlayers?: number;
+  difficulty?: Difficulty;
   gamePlayers?: {id: string; name: string; isHost: boolean}[];
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
@@ -31,17 +31,15 @@ export function MultiplayerQuiz({
   selectedFriends, 
   questionCount = 10, 
   maxPlayers = 2,
+  difficulty = 'medium',
   gamePlayers = [],
   onComplete, 
   onExit 
 }: MultiplayerQuizProps) {
-  // خلط الأسئلة وتحديد العدد المطلوب
+  // فلترة الأسئلة حسب الصعوبة المختارة
   const questions = useMemo(() => {
-    const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
-    const shuffled = shuffleQuestions(originalQuestions);
-    // أخذ عدد الأسئلة المحدد فقط
-    return shuffled.slice(0, Math.min(questionCount, shuffled.length));
-  }, [subject.id, questionCount]);
+    return getQuestionsByDifficulty(subject.id, difficulty, questionCount);
+  }, [subject.id, questionCount, difficulty]);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
