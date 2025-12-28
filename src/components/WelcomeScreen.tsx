@@ -18,16 +18,17 @@ export function WelcomeScreen({
   onNameChange 
 }: WelcomeScreenProps) {
   const [isEditing, setIsEditing] = useState(!userName);
-  const [tempName, setTempName] = useState(userName);
+  const [tempName, setTempName] = useState(userName || '');
 
   useEffect(() => {
-    setTempName(userName);
+    setTempName(userName || '');
     setIsEditing(!userName);
   }, [userName]);
 
   const handleSaveName = () => {
-    if (tempName.trim()) {
-      onNameChange(tempName.trim());
+    const trimmedName = (tempName || '').trim();
+    if (trimmedName) {
+      onNameChange(trimmedName);
       setIsEditing(false);
     }
   };
@@ -71,7 +72,7 @@ export function WelcomeScreen({
               />
               <button
                 onClick={handleSaveName}
-                disabled={!tempName.trim()}
+                disabled={!(tempName || '').trim()}
                 className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground font-bold disabled:opacity-50"
               >
                 حفظ
