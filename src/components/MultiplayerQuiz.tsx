@@ -18,16 +18,29 @@ interface Player {
 interface MultiplayerQuizProps {
   subject: Subject;
   selectedFriends: Friend[];
+  questionCount?: number;
+  maxPlayers?: number;
+  gamePlayers?: {id: string; name: string; isHost: boolean}[];
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
 }
 
-export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }: MultiplayerQuizProps) {
-  // خلط الأسئلة عند بدء اللعبة
+export function MultiplayerQuiz({ 
+  subject, 
+  selectedFriends, 
+  questionCount = 10, 
+  maxPlayers = 2,
+  gamePlayers = [],
+  onComplete, 
+  onExit 
+}: MultiplayerQuizProps) {
+  // خلط الأسئلة وتحديد العدد المطلوب
   const questions = useMemo(() => {
     const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
-    return shuffleQuestions(originalQuestions);
-  }, [subject.id]);
+    const shuffled = shuffleQuestions(originalQuestions);
+    // أخذ عدد الأسئلة المحدد فقط
+    return shuffled.slice(0, Math.min(questionCount, shuffled.length));
+  }, [subject.id, questionCount]);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -39,20 +52,53 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
   const currentQ = questions[currentQuestion];
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
-  // Initialize players
+  // Initialize players - استخدام اللاعبين من غرفة الانتظار أو إنشاء لاعبين وهميين
   useEffect(() => {
-    // Create fake opponents if no friends selected
-    const fakeFriends: Friend[] = selectedFriends.length > 0 ? selectedFriends : [
-      { id: '2', name: 'أحمد', avatar: 'user', points: 100, isOnline: true },
-      { id: '3', name: 'صالح', avatar: 'user', points: 80, isOnline: true },
-    ];
+    let allPlayers: Player[];
     
-    const allPlayers: Player[] = [
-      { id: '1', name: 'أنت', avatar: 'user', score: 0, currentAnswer: null, hasAnswered: false },
-      ...fakeFriends.map(f => ({ id: f.id, name: f.name, avatar: f.avatar, score: 0, currentAnswer: null, hasAnswered: false }))
-    ];
+    if (gamePlayers.length > 0) {
+      // استخدام اللاعبين من غرفة الانتظار
+      allPlayers = gamePlayers.map(p => ({
+        id: p.id,
+        name: p.name,
+        avatar: 'user',
+        score: 0,
+        currentAnswer: null,
+        hasAnswered: false
+      }));
+    } else if (selectedFriends.length > 0) {
+      // استخدام الأصدقاء المحددين
+      allPlayers = [
+        { id: '1', name: 'أنت', avatar: 'user', score: 0, currentAnswer: null, hasAnswered: false },
+        ...selectedFriends.map(f => ({ 
+          id: f.id, 
+          name: f.name, 
+          avatar: f.avatar, 
+          score: 0, 
+          currentAnswer: null, 
+          hasAnswered: false 
+        }))
+      ];
+    } else {
+      // إنشاء لاعبين وهميين بناءً على عدد اللاعبين المحدد
+      const fakeNames = ['أحمد', 'محمد', 'سارة', 'فاطمة'];
+      const fakePlayers = fakeNames.slice(0, maxPlayers - 1).map((name, index) => ({
+        id: `fake_${index + 2}`,
+        name: name,
+        avatar: 'user',
+        score: 0,
+        currentAnswer: null,
+        hasAnswered: false
+      }));
+      
+      allPlayers = [
+        { id: '1', name: 'أنت', avatar: 'user', score: 0, currentAnswer: null, hasAnswered: false },
+        ...fakePlayers
+      ];
+    }
+    
     setPlayers(allPlayers);
-  }, [selectedFriends]);
+  }, [selectedFriends, gamePlayers, maxPlayers]);
 
   // Timer countdown
   useEffect(() => {
