@@ -16,6 +16,8 @@ export type Screen =
 
 export type GameMode = 'create' | 'join';
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export interface User {
   id: string;
   name: string;

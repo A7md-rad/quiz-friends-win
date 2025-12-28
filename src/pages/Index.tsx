@@ -12,7 +12,7 @@ import { CreateGame } from "@/components/CreateGame";
 import { JoinGame } from "@/components/JoinGame";
 import { WaitingRoom } from "@/components/WaitingRoom";
 import { AndroidStatusBar } from "@/components/AndroidStatusBar";
-import { Screen, Subject, Friend } from "@/types/app";
+import { Screen, Subject, Friend, Difficulty } from "@/types/app";
 
 interface GameSettings {
   code: string;
@@ -79,8 +79,9 @@ const Index = () => {
     setCurrentScreen("solo-setup");
   };
 
-  const handleSoloStart = (questionCount: number) => {
+  const handleSoloStart = (questionCount: number, _difficulty: Difficulty) => {
     setSoloQuestionCount(questionCount);
+    // يمكن استخدام difficulty لفلترة الأسئلة لاحقاً
     setCurrentScreen("quiz");
   };
 
@@ -141,8 +142,9 @@ const Index = () => {
     setCurrentScreen("challenge-setup");
   };
 
-  const startChallenge = (subject: Subject, _questionCount: number) => {
+  const startChallenge = (subject: Subject, _questionCount: number, _difficulty: Difficulty) => {
     setSelectedSubject(subject);
+    // يمكن استخدام difficulty لفلترة الأسئلة لاحقاً
     setCurrentScreen("challenge-quiz");
   };
 

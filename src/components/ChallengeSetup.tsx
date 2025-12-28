@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { ArrowRight, Play, Users, User, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Play, Users, User, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Zap, type LucideIcon } from 'lucide-react';
 import { subjects } from '@/data/mockData';
-import { Subject, Friend } from '@/types/app';
+import { Subject, Friend, Difficulty } from '@/types/app';
 import { cn } from '@/lib/utils';
 
 interface ChallengeSetupProps {
   selectedFriends: Friend[];
   onBack: () => void;
-  onStartChallenge: (subject: Subject, questionCount: number) => void;
+  onStartChallenge: (subject: Subject, questionCount: number, difficulty: Difficulty) => void;
 }
 
 const questionCounts = [5, 10, 15];
+
+const difficultyOptions: { value: Difficulty; label: string; color: string }[] = [
+  { value: 'easy', label: 'سهل', color: 'bg-green-500' },
+  { value: 'medium', label: 'متوسط', color: 'bg-yellow-500' },
+  { value: 'hard', label: 'صعب', color: 'bg-red-500' },
+];
 
 const iconMap: Record<string, LucideIcon> = {
   calculator: Calculator,
@@ -33,10 +39,11 @@ const colorClasses: Record<string, { bg: string; icon: string }> = {
 export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: ChallengeSetupProps) {
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedCount, setSelectedCount] = useState(10);
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
 
   const handleStart = () => {
     if (selectedSubject) {
-      onStartChallenge(selectedSubject, selectedCount);
+      onStartChallenge(selectedSubject, selectedCount, difficulty);
     }
   };
 
@@ -124,6 +131,31 @@ export function ChallengeSetup({ selectedFriends, onBack, onStartChallenge }: Ch
                 )}
               >
                 {count}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Difficulty Selection */}
+        <div>
+          <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <Zap className="w-5 h-5 text-primary" />
+            مستوى الصعوبة
+          </h2>
+          <div className="flex gap-3">
+            {difficultyOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setDifficulty(option.value)}
+                className={cn(
+                  'flex-1 py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex flex-col items-center gap-2',
+                  difficulty === option.value
+                    ? 'gradient-primary text-primary-foreground shadow-glow-primary'
+                    : 'bg-card shadow-card text-foreground hover:shadow-md'
+                )}
+              >
+                <div className={cn('w-3 h-3 rounded-full', option.color)} />
+                {option.label}
               </button>
             ))}
           </div>
