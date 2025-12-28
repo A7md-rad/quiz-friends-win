@@ -151,10 +151,31 @@ export function WaitingRoom({
       )
       .subscribe();
 
+    // محاكاة دخول لاعبين عشوائيين للاختبار
+    const randomNames = ['أحمد', 'محمد', 'سارة', 'فاطمة', 'علي', 'نور', 'ياسر', 'هدى'];
+    const addRandomPlayer = async () => {
+      const currentCount = players.length;
+      if (currentCount < maxPlayers) {
+        const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+        await (supabase as any)
+          .from('game_players')
+          .insert({
+            game_id: gameId,
+            name: randomName,
+            is_host: false,
+            is_ready: true
+          });
+      }
+    };
+
+    // إضافة لاعب عشوائي كل 3 ثواني
+    const interval = setInterval(addRandomPlayer, 3000);
+
     return () => {
+      clearInterval(interval);
       supabase.removeChannel(channel);
     };
-  }, [gameId]);
+  }, [gameId, players.length, maxPlayers]);
 
   // تنظيف عند الخروج
   const handleBack = async () => {
