@@ -24,6 +24,7 @@ export type Database = {
           joined_at: string
           name: string
           score: number
+          session_id: string | null
         }
         Insert: {
           current_question?: number
@@ -34,6 +35,7 @@ export type Database = {
           joined_at?: string
           name: string
           score?: number
+          session_id?: string | null
         }
         Update: {
           current_question?: number
@@ -44,6 +46,7 @@ export type Database = {
           joined_at?: string
           name?: string
           score?: number
+          session_id?: string | null
         }
         Relationships: [
           {
@@ -61,6 +64,7 @@ export type Database = {
           created_at: string
           difficulty: string
           host_name: string
+          host_session_id: string | null
           id: string
           max_players: number
           question_count: number
@@ -74,6 +78,7 @@ export type Database = {
           created_at?: string
           difficulty?: string
           host_name: string
+          host_session_id?: string | null
           id?: string
           max_players?: number
           question_count?: number
@@ -87,6 +92,7 @@ export type Database = {
           created_at?: string
           difficulty?: string
           host_name?: string
+          host_session_id?: string | null
           id?: string
           max_players?: number
           question_count?: number
