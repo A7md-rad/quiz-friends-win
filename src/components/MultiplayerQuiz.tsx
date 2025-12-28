@@ -200,15 +200,20 @@ export function MultiplayerQuiz({
 
   // Calculate scores when showing results and play sound
   useEffect(() => {
-    if (phase === 'results') {
+    if (phase === 'results' && currentQ) {
+      const correctAnswer = currentQ.correctAnswer;
+      const points = currentQ.points;
+      
       setPlayers(prev => prev.map(p => {
-        if (p.currentAnswer === currentQ.correctAnswer) {
-          return { ...p, score: p.score + currentQ.points };
+        if (p.currentAnswer === correctAnswer) {
+          return { ...p, score: p.score + points };
         }
         return p;
       }));
       
-      if (userAnswer === currentQ.correctAnswer) {
+      // Check user's answer
+      const isCorrect = userAnswer === correctAnswer;
+      if (isCorrect) {
         setCorrectCount(prev => prev + 1);
         if (soundEnabled) {
           playCorrectSound();
@@ -219,7 +224,7 @@ export function MultiplayerQuiz({
         }
       }
     }
-  }, [phase]);
+  }, [phase, currentQuestion]);
 
   const handleNextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
@@ -229,9 +234,11 @@ export function MultiplayerQuiz({
       setUserAnswer(null);
       setPlayers(prev => prev.map(p => ({ ...p, currentAnswer: null, hasAnswered: false })));
     } else {
-      // Quiz complete
+      // Quiz complete - حساب الإجابات الصحيحة بشكل صحيح
       const userPlayer = players.find(p => p.id === '1');
-      onComplete(userPlayer?.score || 0, correctCount, questions.length);
+      // إضافة 1 إذا كانت الإجابة الأخيرة صحيحة (لأن correctCount لم يتحدث بعد)
+      const finalCorrectCount = userAnswer === currentQ.correctAnswer ? correctCount + 1 : correctCount;
+      onComplete(userPlayer?.score || 0, finalCorrectCount, questions.length);
     }
   };
 
