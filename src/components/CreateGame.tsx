@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Copy, Check, Users, HelpCircle, Play, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Zap, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Copy, Check, Users, HelpCircle, Play, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Zap, Clock, type LucideIcon } from 'lucide-react';
 import { Subject, Difficulty } from '@/types/app';
 import { subjects } from '@/data/mockData';
 import { generateGameCode } from '@/utils/gameUtils';
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 interface CreateGameProps {
   onBack: () => void;
-  onStartGame: (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string, difficulty: Difficulty) => void;
+  onStartGame: (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string, difficulty: Difficulty, timePerQuestion: number) => void;
 }
 
 const subjectIconMap: Record<string, LucideIcon> = {
@@ -22,6 +22,7 @@ const subjectIconMap: Record<string, LucideIcon> = {
 
 const questionCountOptions = [5, 10, 15];
 const playerCountOptions = [2, 3, 4];
+const timeOptions = [10, 15, 20, 30];
 
 const difficultyOptions: { value: Difficulty; label: string; color: string }[] = [
   { value: 'easy', label: 'سهل', color: 'bg-green-500' },
@@ -35,6 +36,7 @@ export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
   const [questionCount, setQuestionCount] = useState(10);
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+  const [timePerQuestion, setTimePerQuestion] = useState(15);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
       toast.error('اختر مادة أولاً');
       return;
     }
-    onStartGame(selectedSubject, questionCount, maxPlayers, gameCode, difficulty);
+    onStartGame(selectedSubject, questionCount, maxPlayers, gameCode, difficulty, timePerQuestion);
   };
 
   const canStart = selectedSubject !== null;
@@ -189,25 +191,49 @@ export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
       </div>
 
       {/* Difficulty Selection */}
-      <div className="mb-6">
+      <div className="mb-4">
         <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
           <Zap className="w-5 h-5 text-primary" />
           مستوى الصعوبة
         </h2>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {difficultyOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => setDifficulty(option.value)}
               className={cn(
-                'flex-1 py-4 rounded-xl font-bold text-base transition-all active:scale-95 flex flex-col items-center gap-2',
+                'flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-95 flex flex-col items-center gap-1',
                 difficulty === option.value
                   ? 'gradient-primary text-primary-foreground shadow-glow-primary'
                   : 'bg-card shadow-card hover:shadow-md text-foreground'
               )}
             >
-              <div className={cn('w-3 h-3 rounded-full', option.color)} />
+              <div className={cn('w-2 h-2 rounded-full', option.color)} />
               {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Time Per Question */}
+      <div className="mb-6">
+        <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-primary" />
+          الوقت لكل سؤال (ثانية)
+        </h2>
+        <div className="flex gap-2">
+          {timeOptions.map((time) => (
+            <button
+              key={time}
+              onClick={() => setTimePerQuestion(time)}
+              className={cn(
+                'flex-1 py-3 rounded-xl font-bold text-base transition-all active:scale-95',
+                timePerQuestion === time
+                  ? 'gradient-secondary text-secondary-foreground shadow-md'
+                  : 'bg-card shadow-card hover:shadow-md text-foreground'
+              )}
+            >
+              {time}
             </button>
           ))}
         </div>

@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Star, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Sparkles, type LucideIcon } from 'lucide-react';
+import { X, Check, Star, Clock, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Sparkles, type LucideIcon } from 'lucide-react';
 import { Subject, Question, QuizState, Difficulty } from '@/types/app';
 import { sampleQuestions, getQuestionsByDifficulty } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
@@ -10,6 +10,7 @@ interface QuizPageProps {
   subject: Subject;
   questionCount?: number;
   difficulty?: Difficulty;
+  timePerQuestion?: number;
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
 }
@@ -23,11 +24,14 @@ const subjectIconMap: Record<string, LucideIcon> = {
   languages: Languages,
 };
 
-export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', onComplete, onExit }: QuizPageProps) {
+export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', timePerQuestion = 15, onComplete, onExit }: QuizPageProps) {
   // فلترة الأسئلة حسب الصعوبة
   const questions = useMemo(() => {
     return getQuestionsByDifficulty(subject.id, difficulty, questionCount);
   }, [subject.id, questionCount, difficulty]);
+
+  const [timer, setTimer] = useState(timePerQuestion);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [state, setState] = useState<QuizState>({
     currentQuestion: 0,
@@ -44,8 +48,41 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', o
 
   const [correctCount, setCorrectCount] = useState(0);
 
+  // Timer effect
+  useEffect(() => {
+    if (showFeedback) return;
+    
+    timerRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          // Time's up - auto select wrong answer
+          handleTimeUp();
+          return timePerQuestion;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [state.currentQuestion, showFeedback]);
+
+  const handleTimeUp = () => {
+    if (showFeedback) return;
+    setSelectedAnswer(-1); // No answer selected
+    setIsCorrect(false);
+    setShowFeedback(true);
+    
+    setTimeout(() => {
+      handleNext(false);
+    }, 1500);
+  };
+
   const handleSelectAnswer = (answerIndex: number) => {
     if (showFeedback) return;
+    
+    if (timerRef.current) clearInterval(timerRef.current);
     
     setSelectedAnswer(answerIndex);
     const correct = answerIndex === currentQ.correctAnswer;
@@ -75,6 +112,7 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', o
       }));
       setSelectedAnswer(null);
       setShowFeedback(false);
+      setTimer(timePerQuestion);
     } else {
       // Quiz complete - استخدام correctCount المحدث
       const finalScore = state.score + (wasCorrect ? currentQ.points : 0);
@@ -94,6 +132,15 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', o
       {/* Header */}
       <div className="p-5">
         <div className="flex items-center justify-between mb-4">
+          {/* Timer */}
+          <div className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-full",
+            timer <= 5 ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-primary/20 text-primary"
+          )}>
+            <Clock className="w-5 h-5" />
+            <span className="text-xl font-bold">{timer}</span>
+          </div>
+
           {/* Points badge */}
           <div className="flex items-center gap-2 px-5 py-3 rounded-full gradient-secondary">
             <span className="text-lg font-bold text-secondary-foreground">{state.score}</span>

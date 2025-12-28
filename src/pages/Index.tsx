@@ -22,6 +22,7 @@ interface GameSettings {
   maxPlayers: number;
   isHost: boolean;
   difficulty: Difficulty;
+  timePerQuestion: number;
 }
 
 const Index = () => {
@@ -38,7 +39,8 @@ const Index = () => {
     questionCount: 10,
     maxPlayers: 2,
     isHost: false,
-    difficulty: 'medium'
+    difficulty: 'medium',
+    timePerQuestion: 15
   });
   
   // Players from waiting room
@@ -47,6 +49,7 @@ const Index = () => {
   // Solo quiz settings
   const [soloQuestionCount, setSoloQuestionCount] = useState(10);
   const [soloDifficulty, setSoloDifficulty] = useState<Difficulty>('medium');
+  const [soloTimePerQuestion, setSoloTimePerQuestion] = useState(15);
   
   // User state
   const [userName, setUserName] = useState(() => {
@@ -83,9 +86,10 @@ const Index = () => {
     setCurrentScreen("solo-setup");
   };
 
-  const handleSoloStart = (questionCount: number, difficulty: Difficulty) => {
+  const handleSoloStart = (questionCount: number, difficulty: Difficulty, timePerQuestion: number) => {
     setSoloQuestionCount(questionCount);
     setSoloDifficulty(difficulty);
+    setSoloTimePerQuestion(timePerQuestion);
     setCurrentScreen("quiz");
   };
 
@@ -106,14 +110,15 @@ const Index = () => {
     setCurrentScreen("join-game");
   };
 
-  const handleCreateGameStart = (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string, difficulty: Difficulty) => {
+  const handleCreateGameStart = (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string, difficulty: Difficulty, timePerQuestion: number) => {
     setGameSettings({
       code: gameCode,
       subject: subject,
       questionCount: questionCount,
       maxPlayers: maxPlayers,
       isHost: true,
-      difficulty: difficulty
+      difficulty: difficulty,
+      timePerQuestion: timePerQuestion
     });
     setSelectedSubject(subject);
     setIsChallenge(true);
@@ -128,7 +133,8 @@ const Index = () => {
       questionCount: 10,
       maxPlayers: 4,
       isHost: false,
-      difficulty: 'medium'
+      difficulty: 'medium',
+      timePerQuestion: 15
     });
     setIsChallenge(true);
     setCurrentScreen("join-waiting-room");
@@ -236,6 +242,7 @@ const Index = () => {
             subject={selectedSubject} 
             questionCount={soloQuestionCount}
             difficulty={soloDifficulty}
+            timePerQuestion={soloTimePerQuestion}
             onComplete={handleQuizComplete} 
             onExit={goToWelcome} 
           />
@@ -271,6 +278,7 @@ const Index = () => {
             questionCount={gameSettings.questionCount}
             maxPlayers={gameSettings.maxPlayers}
             difficulty={gameSettings.difficulty}
+            timePerQuestion={gameSettings.timePerQuestion}
             gamePlayers={gamePlayers}
             onComplete={handleQuizComplete}
             onExit={goToWelcome}

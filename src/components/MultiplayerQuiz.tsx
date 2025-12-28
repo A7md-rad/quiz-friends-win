@@ -21,6 +21,7 @@ interface MultiplayerQuizProps {
   questionCount?: number;
   maxPlayers?: number;
   difficulty?: Difficulty;
+  timePerQuestion?: number;
   gamePlayers?: {id: string; name: string; isHost: boolean}[];
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
@@ -32,6 +33,7 @@ export function MultiplayerQuiz({
   questionCount = 10, 
   maxPlayers = 2,
   difficulty = 'medium',
+  timePerQuestion = 15,
   gamePlayers = [],
   onComplete, 
   onExit 
@@ -44,7 +46,7 @@ export function MultiplayerQuiz({
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
   const [phase, setPhase] = useState<'answering' | 'results'>('answering');
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(timePerQuestion);
   const [userAnswer, setUserAnswer] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -121,7 +123,7 @@ export function MultiplayerQuiz({
             playTimeUpSound();
           }
           handleTimeUp();
-          return 10;
+          return timePerQuestion;
         }
         return newTimer;
       });
@@ -228,7 +230,7 @@ export function MultiplayerQuiz({
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
       setPhase('answering');
-      setTimer(10);
+      setTimer(timePerQuestion);
       setUserAnswer(null);
       setPlayers(prev => prev.map(p => ({ ...p, currentAnswer: null, hasAnswered: false })));
     } else {
