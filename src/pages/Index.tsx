@@ -9,8 +9,17 @@ import { ChallengeSetup } from "@/components/ChallengeSetup";
 import { GameModeSelection } from "@/components/GameModeSelection";
 import { CreateGame } from "@/components/CreateGame";
 import { JoinGame } from "@/components/JoinGame";
+import { WaitingRoom } from "@/components/WaitingRoom";
 import { AndroidStatusBar } from "@/components/AndroidStatusBar";
 import { Screen, Subject, Friend } from "@/types/app";
+
+interface GameSettings {
+  code: string;
+  subject: Subject | null;
+  questionCount: number;
+  maxPlayers: number;
+  isHost: boolean;
+}
 
 const Index = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>("welcome");
@@ -18,6 +27,18 @@ const Index = () => {
   const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
   const [quizResult, setQuizResult] = useState({ score: 0, correct: 0, total: 0 });
   const [isChallenge, setIsChallenge] = useState(false);
+  
+  // Game settings for multiplayer
+  const [gameSettings, setGameSettings] = useState<GameSettings>({
+    code: '',
+    subject: null,
+    questionCount: 10,
+    maxPlayers: 2,
+    isHost: false
+  });
+  
+  // Players from waiting room
+  const [gamePlayers, setGamePlayers] = useState<{id: string; name: string; isHost: boolean}[]>([]);
   
   // User state
   const [userName, setUserName] = useState(() => {
@@ -66,17 +87,35 @@ const Index = () => {
     setCurrentScreen("join-game");
   };
 
-  const handleCreateGameStart = (subject: Subject, questionCount: number) => {
+  const handleCreateGameStart = (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string) => {
+    setGameSettings({
+      code: gameCode,
+      subject: subject,
+      questionCount: questionCount,
+      maxPlayers: maxPlayers,
+      isHost: true
+    });
     setSelectedSubject(subject);
     setIsChallenge(true);
-    setSelectedFriends([]);
-    setCurrentScreen("challenge-quiz");
+    setCurrentScreen("waiting-room");
   };
 
   const handleJoinSuccess = (code: string) => {
+    // للمنضم: المضيف يحدد الإعدادات
+    setGameSettings({
+      code: code,
+      subject: null,
+      questionCount: 10,
+      maxPlayers: 4,
+      isHost: false
+    });
     setIsChallenge(true);
-    setSelectedFriends([]);
-    setCurrentScreen("subject-selection");
+    setCurrentScreen("waiting-room");
+  };
+  
+  const handleWaitingRoomStart = (players: {id: string; name: string; isHost: boolean}[]) => {
+    setGamePlayers(players);
+    setCurrentScreen("challenge-quiz");
   };
 
   const goToFriendsList = () => {
@@ -157,11 +196,27 @@ const Index = () => {
           <QuizPage subject={selectedSubject} onComplete={handleQuizComplete} onExit={goToWelcome} />
         ) : null;
 
+      case "waiting-room":
+        return gameSettings.subject ? (
+          <WaitingRoom
+            gameCode={gameSettings.code}
+            subject={gameSettings.subject}
+            questionCount={gameSettings.questionCount}
+            maxPlayers={gameSettings.maxPlayers}
+            isHost={gameSettings.isHost}
+            onBack={goToGameModeSelection}
+            onStartGame={handleWaitingRoomStart}
+          />
+        ) : null;
+
       case "challenge-quiz":
         return selectedSubject ? (
           <MultiplayerQuiz
             subject={selectedSubject}
             selectedFriends={selectedFriends}
+            questionCount={gameSettings.questionCount}
+            maxPlayers={gameSettings.maxPlayers}
+            gamePlayers={gamePlayers}
             onComplete={handleQuizComplete}
             onExit={goToWelcome}
           />

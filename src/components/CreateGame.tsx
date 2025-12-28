@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 interface CreateGameProps {
   onBack: () => void;
-  onStartGame: (subject: Subject, questionCount: number) => void;
+  onStartGame: (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string) => void;
 }
 
 const subjectIconMap: Record<string, LucideIcon> = {
@@ -50,7 +50,7 @@ export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
       toast.error('اختر مادة أولاً');
       return;
     }
-    onStartGame(selectedSubject, questionCount);
+    onStartGame(selectedSubject, questionCount, maxPlayers, gameCode);
   };
 
   const canStart = selectedSubject !== null;

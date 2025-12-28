@@ -10,7 +10,8 @@ export type Screen =
   | 'profile'
   | 'game-mode-selection'
   | 'create-game'
-  | 'join-game';
+  | 'join-game'
+  | 'waiting-room';
 
 export type GameMode = 'create' | 'join';
 
