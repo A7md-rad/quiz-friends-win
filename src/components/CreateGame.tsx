@@ -20,13 +20,13 @@ const subjectIconMap: Record<string, LucideIcon> = {
   languages: Languages,
 };
 
-// عدد الأسئلة ثابت على 10
+const questionCountOptions = [5, 10, 15];
 const playerCountOptions = [2, 3, 4];
 
 export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
   const [gameCode, setGameCode] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const questionCount = 10; // ثابت على 10 أسئلة
+  const [questionCount, setQuestionCount] = useState(10);
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [copied, setCopied] = useState(false);
 
@@ -133,7 +133,29 @@ export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
         </div>
       </div>
 
-      {/* عدد الأسئلة ثابت على 10 */}
+      {/* Question Count */}
+      <div className="mb-6">
+        <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+          <HelpCircle className="w-5 h-5 text-primary" />
+          عدد الأسئلة
+        </h2>
+        <div className="flex gap-3">
+          {questionCountOptions.map((count) => (
+            <button
+              key={count}
+              onClick={() => setQuestionCount(count)}
+              className={cn(
+                'flex-1 py-4 rounded-xl font-bold text-lg transition-all active:scale-95',
+                questionCount === count
+                  ? 'gradient-secondary text-secondary-foreground shadow-md'
+                  : 'bg-card shadow-card hover:shadow-md text-foreground'
+              )}
+            >
+              {count}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Player Count */}
       <div className="mb-6">
