@@ -41,6 +41,8 @@ export function QuizPage({ subject, onComplete, onExit }: QuizPageProps) {
   const currentQ = questions[state.currentQuestion];
   const progress = ((state.currentQuestion + 1) / questions.length) * 100;
 
+  const [correctCount, setCorrectCount] = useState(0);
+
   const handleSelectAnswer = (answerIndex: number) => {
     if (showFeedback) return;
     
@@ -54,15 +56,16 @@ export function QuizPage({ subject, onComplete, onExit }: QuizPageProps) {
         ...prev,
         score: prev.score + currentQ.points,
       }));
+      setCorrectCount(prev => prev + 1);
     }
 
     // Auto advance after feedback
     setTimeout(() => {
-      handleNext();
+      handleNext(correct);
     }, 1500);
   };
 
-  const handleNext = () => {
+  const handleNext = (wasCorrect: boolean) => {
     if (state.currentQuestion < questions.length - 1) {
       setState(prev => ({
         ...prev,
@@ -72,12 +75,10 @@ export function QuizPage({ subject, onComplete, onExit }: QuizPageProps) {
       setSelectedAnswer(null);
       setShowFeedback(false);
     } else {
-      // Quiz complete
-      const correctAnswers = state.answers.filter((a, i) => 
-        a === questions[i]?.correctAnswer
-      ).length + (selectedAnswer === currentQ.correctAnswer ? 1 : 0);
-      
-      onComplete(state.score + (isCorrect ? currentQ.points : 0), correctAnswers, questions.length);
+      // Quiz complete - استخدام correctCount المحدث
+      const finalScore = state.score + (wasCorrect ? currentQ.points : 0);
+      const finalCorrectCount = correctCount + (wasCorrect ? 1 : 0);
+      onComplete(finalScore, finalCorrectCount, questions.length);
     }
   };
 
