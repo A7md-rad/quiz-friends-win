@@ -21,6 +21,7 @@ interface GameSettings {
   questionCount: number;
   maxPlayers: number;
   isHost: boolean;
+  difficulty: Difficulty;
 }
 
 const Index = () => {
@@ -36,7 +37,8 @@ const Index = () => {
     subject: null,
     questionCount: 10,
     maxPlayers: 2,
-    isHost: false
+    isHost: false,
+    difficulty: 'medium'
   });
   
   // Players from waiting room
@@ -104,13 +106,14 @@ const Index = () => {
     setCurrentScreen("join-game");
   };
 
-  const handleCreateGameStart = (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string) => {
+  const handleCreateGameStart = (subject: Subject, questionCount: number, maxPlayers: number, gameCode: string, difficulty: Difficulty) => {
     setGameSettings({
       code: gameCode,
       subject: subject,
       questionCount: questionCount,
       maxPlayers: maxPlayers,
-      isHost: true
+      isHost: true,
+      difficulty: difficulty
     });
     setSelectedSubject(subject);
     setIsChallenge(true);
@@ -124,7 +127,8 @@ const Index = () => {
       subject: null,
       questionCount: 10,
       maxPlayers: 4,
-      isHost: false
+      isHost: false,
+      difficulty: 'medium'
     });
     setIsChallenge(true);
     setCurrentScreen("join-waiting-room");
