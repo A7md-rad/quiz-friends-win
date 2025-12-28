@@ -12,7 +12,10 @@ export function GameModeSelection({ onCreateGame, onJoinGame, onBack }: GameMode
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button
-          onClick={onBack}
+          onClick={() => {
+            console.log('Back button clicked');
+            onBack();
+          }}
           className="w-12 h-12 rounded-2xl bg-card shadow-card flex items-center justify-center hover:shadow-md transition-shadow active:scale-95"
         >
           <ArrowRight className="w-6 h-6 text-foreground" />
