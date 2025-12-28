@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Star, Crown, Clock } from 'lucide-react';
-import { Subject, Question } from '@/types/app';
-import { sampleQuestions, currentUser, friends } from '@/data/mockData';
+import { X, Check, Crown, Clock } from 'lucide-react';
+import { Subject, Question, Friend } from '@/types/app';
+import { sampleQuestions } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +17,7 @@ interface Player {
 
 interface MultiplayerQuizProps {
   subject: Subject;
-  selectedFriends: typeof friends;
+  selectedFriends: Friend[];
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
 }
@@ -41,9 +41,15 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
 
   // Initialize players
   useEffect(() => {
+    // Create fake opponents if no friends selected
+    const fakeFriends: Friend[] = selectedFriends.length > 0 ? selectedFriends : [
+      { id: '2', name: 'أحمد', avatar: 'user', points: 100, isOnline: true },
+      { id: '3', name: 'صالح', avatar: 'user', points: 80, isOnline: true },
+    ];
+    
     const allPlayers: Player[] = [
-      { id: currentUser.id, name: currentUser.name, avatar: currentUser.avatar, score: 0, currentAnswer: null, hasAnswered: false },
-      ...selectedFriends.map(f => ({ id: f.id, name: f.name, avatar: f.avatar, score: 0, currentAnswer: null, hasAnswered: false }))
+      { id: '1', name: 'أنت', avatar: 'user', score: 0, currentAnswer: null, hasAnswered: false },
+      ...fakeFriends.map(f => ({ id: f.id, name: f.name, avatar: f.avatar, score: 0, currentAnswer: null, hasAnswered: false }))
     ];
     setPlayers(allPlayers);
   }, [selectedFriends]);
@@ -70,12 +76,15 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
   useEffect(() => {
     if (phase !== 'answering') return;
 
-    selectedFriends.forEach((friend) => {
+    // Get opponent IDs (not the first player which is the user)
+    const opponentIds = players.filter(p => p.id !== '1').map(p => p.id);
+    
+    opponentIds.forEach((opponentId) => {
       const delay = 2000 + Math.random() * 5000; // 2-7 seconds
       const timeout = setTimeout(() => {
         if (phase === 'answering') {
           setPlayers(prev => prev.map(p => {
-            if (p.id === friend.id && !p.hasAnswered) {
+            if (p.id === opponentId && !p.hasAnswered) {
               // 60% chance to answer correctly
               const answerCorrectly = Math.random() < 0.6;
               const answer = answerCorrectly ? currentQ.correctAnswer : 
@@ -88,12 +97,12 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
       }, delay);
       return () => clearTimeout(timeout);
     });
-  }, [currentQuestion, phase]);
+  }, [currentQuestion, phase, players.length]);
 
   const handleTimeUp = () => {
     // Make sure all players have answered (random for those who haven't)
     setPlayers(prev => prev.map(p => {
-      if (!p.hasAnswered && p.id !== currentUser.id) {
+      if (!p.hasAnswered && p.id !== '1') {
         const answerCorrectly = Math.random() < 0.5;
         const answer = answerCorrectly ? currentQ.correctAnswer : 
           Math.floor(Math.random() * currentQ.options.length);
@@ -109,14 +118,14 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
     
     setUserAnswer(answerIndex);
     setPlayers(prev => prev.map(p => {
-      if (p.id === currentUser.id) {
+      if (p.id === '1') {
         return { ...p, currentAnswer: answerIndex, hasAnswered: true };
       }
       return p;
     }));
 
     // Check if all players answered
-    const allAnswered = players.every(p => p.id === currentUser.id ? true : p.hasAnswered);
+    const allAnswered = players.every(p => p.id === '1' ? true : p.hasAnswered);
     if (allAnswered) {
       setTimeout(() => {
         setPhase('results');
@@ -149,7 +158,7 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
       setPlayers(prev => prev.map(p => ({ ...p, currentAnswer: null, hasAnswered: false })));
     } else {
       // Quiz complete
-      const userPlayer = players.find(p => p.id === currentUser.id);
+      const userPlayer = players.find(p => p.id === '1');
       onComplete(userPlayer?.score || 0, correctCount, questions.length);
     }
   };
@@ -216,7 +225,7 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
             >
               <div className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold relative",
-                player.id === currentUser.id ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                player.id === '1' ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
               )}>
                 {player.name.charAt(0)}
                 {player.hasAnswered && phase === 'answering' && (
@@ -314,7 +323,7 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
                         key={p.id}
                         className={cn(
                           "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 border-card",
-                          p.id === currentUser.id ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                          p.id === '1' ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
                         )}
                       >
                         {p.name.charAt(0)}
@@ -340,7 +349,7 @@ export function MultiplayerQuiz({ subject, selectedFriends, onComplete, onExit }
                   {index === 0 && <Crown className="w-5 h-5 text-warning mb-1" />}
                   <div className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
-                    player.id === currentUser.id ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                    player.id === '1' ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
                   )}>
                     {player.name.charAt(0)}
                   </div>

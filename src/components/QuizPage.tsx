@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Check, Star, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Sparkles, type LucideIcon } from 'lucide-react';
 import { Subject, Question, QuizState } from '@/types/app';
-import { sampleQuestions, currentUser, friends } from '@/data/mockData';
+import { sampleQuestions } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 
@@ -10,8 +10,6 @@ interface QuizPageProps {
   subject: Subject;
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
-  isChallenge?: boolean;
-  opponent?: typeof friends[0];
 }
 
 const subjectIconMap: Record<string, LucideIcon> = {
@@ -23,7 +21,7 @@ const subjectIconMap: Record<string, LucideIcon> = {
   languages: Languages,
 };
 
-export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opponent }: QuizPageProps) {
+export function QuizPage({ subject, onComplete, onExit }: QuizPageProps) {
   // خلط الأسئلة عند بدء اللعبة
   const questions = useMemo(() => {
     const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
@@ -96,7 +94,7 @@ export function QuizPage({ subject, onComplete, onExit, isChallenge = false, opp
         <div className="flex items-center justify-between mb-4">
           {/* Points badge */}
           <div className="flex items-center gap-2 px-5 py-3 rounded-full gradient-secondary">
-            <span className="text-lg font-bold text-secondary-foreground">{currentUser.points + state.score}</span>
+            <span className="text-lg font-bold text-secondary-foreground">{state.score}</span>
             <Star className="w-5 h-5 text-secondary-foreground fill-secondary-foreground" />
           </div>
 
