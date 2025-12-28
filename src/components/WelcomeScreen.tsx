@@ -27,7 +27,7 @@ export function WelcomeScreen({
 
   const handleSaveName = () => {
     const trimmedName = (tempName || '').trim();
-    if (trimmedName) {
+    if (trimmedName && typeof onNameChange === 'function') {
       onNameChange(trimmedName);
       setIsEditing(false);
     }
