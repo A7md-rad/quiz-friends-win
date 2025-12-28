@@ -1,6 +1,7 @@
 export type Screen = 
   | 'welcome' 
   | 'subject-selection' 
+  | 'solo-setup'
   | 'quiz' 
   | 'quiz-result' 
   | 'friends-list' 

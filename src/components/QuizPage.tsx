@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface QuizPageProps {
   subject: Subject;
+  questionCount?: number;
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
 }
@@ -21,12 +22,13 @@ const subjectIconMap: Record<string, LucideIcon> = {
   languages: Languages,
 };
 
-export function QuizPage({ subject, onComplete, onExit }: QuizPageProps) {
-  // خلط الأسئلة عند بدء اللعبة
+export function QuizPage({ subject, questionCount = 10, onComplete, onExit }: QuizPageProps) {
+  // خلط الأسئلة وتحديد العدد المطلوب
   const questions = useMemo(() => {
     const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
-    return shuffleQuestions(originalQuestions);
-  }, [subject.id]);
+    const shuffled = shuffleQuestions(originalQuestions);
+    return shuffled.slice(0, Math.min(questionCount, shuffled.length));
+  }, [subject.id, questionCount]);
 
   const [state, setState] = useState<QuizState>({
     currentQuestion: 0,
