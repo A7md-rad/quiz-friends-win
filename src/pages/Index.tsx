@@ -270,6 +270,7 @@ const Index = () => {
             selectedFriends={selectedFriends}
             questionCount={gameSettings.questionCount}
             maxPlayers={gameSettings.maxPlayers}
+            difficulty={gameSettings.difficulty}
             gamePlayers={gamePlayers}
             onComplete={handleQuizComplete}
             onExit={goToWelcome}
