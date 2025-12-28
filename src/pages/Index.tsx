@@ -11,6 +11,7 @@ import { GameModeSelection } from "@/components/GameModeSelection";
 import { CreateGame } from "@/components/CreateGame";
 import { JoinGame } from "@/components/JoinGame";
 import { WaitingRoom } from "@/components/WaitingRoom";
+import { JoinWaitingRoom } from "@/components/JoinWaitingRoom";
 import { AndroidStatusBar } from "@/components/AndroidStatusBar";
 import { Screen, Subject, Friend, Difficulty } from "@/types/app";
 
@@ -43,6 +44,7 @@ const Index = () => {
   
   // Solo quiz settings
   const [soloQuestionCount, setSoloQuestionCount] = useState(10);
+  const [soloDifficulty, setSoloDifficulty] = useState<Difficulty>('medium');
   
   // User state
   const [userName, setUserName] = useState(() => {
@@ -79,9 +81,9 @@ const Index = () => {
     setCurrentScreen("solo-setup");
   };
 
-  const handleSoloStart = (questionCount: number, _difficulty: Difficulty) => {
+  const handleSoloStart = (questionCount: number, difficulty: Difficulty) => {
     setSoloQuestionCount(questionCount);
-    // يمكن استخدام difficulty لفلترة الأسئلة لاحقاً
+    setSoloDifficulty(difficulty);
     setCurrentScreen("quiz");
   };
 
@@ -125,7 +127,15 @@ const Index = () => {
       isHost: false
     });
     setIsChallenge(true);
-    setCurrentScreen("waiting-room");
+    setCurrentScreen("join-waiting-room");
+  };
+
+  const handleJoinGameStart = () => {
+    // محاكاة بدء اللعبة من المضيف
+    // في الواقع سيتم تحديد المادة من الخادم
+    const mockSubject: Subject = { id: 'math', name: 'رياضيات', icon: 'calculator', color: 'primary', questionsCount: 50 };
+    setSelectedSubject(mockSubject);
+    setCurrentScreen("challenge-quiz");
   };
   
   const handleWaitingRoomStart = (players: {id: string; name: string; isHost: boolean}[]) => {
@@ -221,6 +231,7 @@ const Index = () => {
           <QuizPage 
             subject={selectedSubject} 
             questionCount={soloQuestionCount}
+            difficulty={soloDifficulty}
             onComplete={handleQuizComplete} 
             onExit={goToWelcome} 
           />
@@ -238,6 +249,15 @@ const Index = () => {
             onStartGame={handleWaitingRoomStart}
           />
         ) : null;
+
+      case "join-waiting-room":
+        return (
+          <JoinWaitingRoom
+            gameCode={gameSettings.code}
+            onBack={goToGameModeSelection}
+            onGameStart={handleJoinGameStart}
+          />
+        );
 
       case "challenge-quiz":
         return selectedSubject ? (
