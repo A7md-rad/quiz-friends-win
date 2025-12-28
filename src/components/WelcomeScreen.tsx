@@ -1,59 +1,46 @@
-import { useState } from 'react';
-import { User, Users, Gamepad2, Star, Trophy } from 'lucide-react';
-import { currentUser } from '@/data/mockData';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { isValidGameCode } from '@/utils/gameUtils';
-import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { Users, Gamepad2, Star } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface WelcomeScreenProps {
   onSoloChallenge: () => void;
   onFriendsChallenge: () => void;
-  onProfile?: () => void;
-  onLeaderboard?: () => void;
-  onJoinWithCode?: (code: string) => void;
+  userName: string;
+  totalPoints: number;
+  onNameChange: (name: string) => void;
 }
 
-export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, onLeaderboard, onJoinWithCode }: WelcomeScreenProps) {
-  const [code, setCode] = useState('');
+export function WelcomeScreen({ 
+  onSoloChallenge, 
+  onFriendsChallenge, 
+  userName,
+  totalPoints,
+  onNameChange 
+}: WelcomeScreenProps) {
+  const [isEditing, setIsEditing] = useState(!userName);
+  const [tempName, setTempName] = useState(userName);
 
-  const handleCodeComplete = (value: string) => {
-    setCode(value);
-    if (value.length === 4 && isValidGameCode(value)) {
-      // الانضمام للعبة مباشرة عند إكمال الكود
-      if (onJoinWithCode) {
-        toast.success('جاري الانضمام للعبة...');
-        setTimeout(() => {
-          onJoinWithCode(value);
-        }, 500);
-      }
+  useEffect(() => {
+    setTempName(userName);
+    setIsEditing(!userName);
+  }, [userName]);
+
+  const handleSaveName = () => {
+    if (tempName.trim()) {
+      onNameChange(tempName.trim());
+      setIsEditing(false);
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col p-6 relative dotted-bg">
-      {/* Header with profile, points, and trophy */}
-      <div className="flex items-center justify-between mb-12">
-        {/* Profile button */}
-        <button 
-          onClick={onProfile}
-          className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center hover:shadow-md transition-shadow active:scale-95"
-        >
-          <User className="w-6 h-6 text-primary" />
-        </button>
-
+      {/* Header with points */}
+      <div className="flex items-center justify-center mb-12">
         {/* Points badge */}
         <div className="flex items-center gap-2 px-5 py-3 rounded-full gradient-secondary shadow-md">
-          <span className="text-lg font-bold text-secondary-foreground">{currentUser.points}</span>
+          <span className="text-lg font-bold text-secondary-foreground">{totalPoints}</span>
           <Star className="w-5 h-5 text-secondary-foreground fill-secondary-foreground" />
         </div>
-
-        {/* Trophy button */}
-        <button 
-          onClick={onLeaderboard}
-          className="w-14 h-14 rounded-2xl bg-card shadow-card flex items-center justify-center hover:shadow-md transition-shadow active:scale-95"
-        >
-          <Trophy className="w-6 h-6 text-warning" />
-        </button>
       </div>
 
       {/* Main content */}
@@ -70,16 +57,44 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
           العب و تعلم
         </h1>
 
-        {/* Tagline */}
-        <p className="text-lg text-muted-foreground mb-12">
-          تعلم باللعب ونافس أصدقاءك!
-        </p>
+        {/* User name section */}
+        {isEditing ? (
+          <div className="w-full max-w-xs mb-8">
+            <p className="text-muted-foreground text-center mb-3">أدخل اسمك</p>
+            <div className="flex gap-2">
+              <Input
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                placeholder="اسمك هنا..."
+                className="text-center text-lg"
+                autoFocus
+              />
+              <button
+                onClick={handleSaveName}
+                disabled={!tempName.trim()}
+                className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground font-bold disabled:opacity-50"
+              >
+                حفظ
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button 
+            onClick={() => setIsEditing(true)}
+            className="mb-8 px-4 py-2 rounded-xl bg-card shadow-card hover:shadow-md transition-all"
+          >
+            <p className="text-lg text-foreground font-medium">
+              مرحباً، <span className="text-primary font-bold">{userName}</span> 👋
+            </p>
+          </button>
+        )}
 
         {/* Main buttons */}
         <div className="w-full max-w-sm space-y-4">
           <button
             onClick={onSoloChallenge}
-            className="w-full py-5 px-8 rounded-2xl gradient-primary text-primary-foreground font-bold text-xl flex items-center justify-center gap-3 shadow-glow-primary hover:opacity-95 transition-opacity active:scale-[0.98]"
+            disabled={isEditing}
+            className="w-full py-5 px-8 rounded-2xl gradient-primary text-primary-foreground font-bold text-xl flex items-center justify-center gap-3 shadow-glow-primary hover:opacity-95 transition-opacity active:scale-[0.98] disabled:opacity-50"
           >
             <Gamepad2 className="w-7 h-7" />
             تحدّى نفسك
@@ -87,28 +102,12 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
 
           <button
             onClick={onFriendsChallenge}
-            className="w-full py-5 px-8 rounded-2xl gradient-secondary text-secondary-foreground font-bold text-xl flex items-center justify-center gap-3 shadow-glow-secondary hover:opacity-95 transition-opacity active:scale-[0.98]"
+            disabled={isEditing}
+            className="w-full py-5 px-8 rounded-2xl gradient-secondary text-secondary-foreground font-bold text-xl flex items-center justify-center gap-3 shadow-glow-secondary hover:opacity-95 transition-opacity active:scale-[0.98] disabled:opacity-50"
           >
             <Users className="w-7 h-7" />
             تحدّى أصدقائك
           </button>
-        </div>
-
-        {/* Code input section */}
-        <div className="mt-14 flex flex-col items-center gap-2">
-          <p className="text-muted-foreground text-sm">أدخل كود الانضمام</p>
-          <InputOTP
-            maxLength={4}
-            value={code}
-            onChange={handleCodeComplete}
-          >
-            <InputOTPGroup className="gap-1">
-              <InputOTPSlot index={0} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
-              <InputOTPSlot index={1} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
-              <InputOTPSlot index={2} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
-              <InputOTPSlot index={3} className="w-11 h-11 text-xl font-bold rounded-lg border-2 border-border bg-card" />
-            </InputOTPGroup>
-          </InputOTP>
         </div>
       </div>
     </div>

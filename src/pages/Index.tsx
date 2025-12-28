@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { SubjectSelection } from "@/components/SubjectSelection";
 import { QuizPage } from "@/components/QuizPage";
@@ -6,14 +6,11 @@ import { MultiplayerQuiz } from "@/components/MultiplayerQuiz";
 import { QuizResult } from "@/components/QuizResult";
 import { FriendsList } from "@/components/FriendsList";
 import { ChallengeSetup } from "@/components/ChallengeSetup";
-import { Leaderboard } from "@/components/Leaderboard";
-import { ProfilePage } from "@/components/ProfilePage";
 import { GameModeSelection } from "@/components/GameModeSelection";
 import { CreateGame } from "@/components/CreateGame";
 import { JoinGame } from "@/components/JoinGame";
 import { AndroidStatusBar } from "@/components/AndroidStatusBar";
 import { Screen, Subject, Friend } from "@/types/app";
-import { friends } from "@/data/mockData";
 
 const Index = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>("welcome");
@@ -21,6 +18,23 @@ const Index = () => {
   const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
   const [quizResult, setQuizResult] = useState({ score: 0, correct: 0, total: 0 });
   const [isChallenge, setIsChallenge] = useState(false);
+  
+  // User state
+  const [userName, setUserName] = useState(() => {
+    return localStorage.getItem('userName') || '';
+  });
+  const [totalPoints, setTotalPoints] = useState(() => {
+    return parseInt(localStorage.getItem('totalPoints') || '0', 10);
+  });
+
+  // Save to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('userName', userName);
+  }, [userName]);
+
+  useEffect(() => {
+    localStorage.setItem('totalPoints', totalPoints.toString());
+  }, [totalPoints]);
 
   // Navigation handlers
   const goToWelcome = () => {
@@ -55,17 +69,13 @@ const Index = () => {
   const handleCreateGameStart = (subject: Subject, questionCount: number) => {
     setSelectedSubject(subject);
     setIsChallenge(true);
-    // محاكاة: اختيار أصدقاء عشوائيين للعبة
-    setSelectedFriends(friends.slice(0, 2));
+    setSelectedFriends([]);
     setCurrentScreen("challenge-quiz");
   };
 
   const handleJoinSuccess = (code: string) => {
-    // محاكاة: الانضمام للعبة بناءً على الكود
-    // في الواقع، سنحصل على بيانات اللعبة من السيرفر
     setIsChallenge(true);
-    setSelectedFriends(friends.slice(0, 2));
-    // نذهب لاختيار المادة مؤقتاً (في الواقع ستكون محددة مسبقاً)
+    setSelectedFriends([]);
     setCurrentScreen("subject-selection");
   };
 
@@ -85,19 +95,13 @@ const Index = () => {
 
   const handleQuizComplete = (score: number, correctAnswers: number, totalQuestions: number) => {
     setQuizResult({ score, correct: correctAnswers, total: totalQuestions });
-    if (isChallenge) {
-      setCurrentScreen("leaderboard");
-    } else {
-      setCurrentScreen("quiz-result");
-    }
+    // Add points to total
+    setTotalPoints(prev => prev + score);
+    setCurrentScreen("quiz-result");
   };
 
-  const goToProfile = () => {
-    setCurrentScreen("profile");
-  };
-
-  const goToLeaderboard = () => {
-    setCurrentScreen("leaderboard");
+  const handleNameChange = (name: string) => {
+    setUserName(name);
   };
 
   // Render current screen
@@ -108,9 +112,9 @@ const Index = () => {
           <WelcomeScreen
             onSoloChallenge={() => goToSubjectSelection(false)}
             onFriendsChallenge={goToGameModeSelection}
-            onProfile={goToProfile}
-            onLeaderboard={goToLeaderboard}
-            onJoinWithCode={handleJoinSuccess}
+            userName={userName}
+            totalPoints={totalPoints}
+            onNameChange={handleNameChange}
           />
         );
 
@@ -157,7 +161,7 @@ const Index = () => {
         return selectedSubject ? (
           <MultiplayerQuiz
             subject={selectedSubject}
-            selectedFriends={selectedFriends.length > 0 ? selectedFriends : friends.slice(0, 2)}
+            selectedFriends={selectedFriends}
             onComplete={handleQuizComplete}
             onExit={goToWelcome}
           />
@@ -188,22 +192,14 @@ const Index = () => {
           />
         );
 
-      case "leaderboard":
-        return (
-          <Leaderboard userScore={quizResult.score || 160} onNewChallenge={goToGameModeSelection} onHome={goToWelcome} />
-        );
-
-      case "profile":
-        return <ProfilePage onBack={goToWelcome} />;
-
       default:
         return (
           <WelcomeScreen
             onSoloChallenge={() => goToSubjectSelection(false)}
             onFriendsChallenge={goToGameModeSelection}
-            onProfile={goToProfile}
-            onLeaderboard={goToLeaderboard}
-            onJoinWithCode={handleJoinSuccess}
+            userName={userName}
+            totalPoints={totalPoints}
+            onNameChange={handleNameChange}
           />
         );
     }

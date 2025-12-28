@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, UserPlus, Swords, Check, User, Star } from 'lucide-react';
-import { friends, currentUser } from '@/data/mockData';
 import { Friend } from '@/types/app';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +7,13 @@ interface FriendsListProps {
   onBack: () => void;
   onCreateChallenge: (selectedFriends: Friend[]) => void;
 }
+
+// Hardcoded friends list
+const friendsList: Friend[] = [
+  { id: '2', name: 'أحمد', avatar: 'user', points: 150, isOnline: true },
+  { id: '3', name: 'صالح', avatar: 'user', points: 95, isOnline: true },
+  { id: '4', name: 'خالد', avatar: 'user', points: 60, isOnline: false },
+];
 
 export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
   const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
@@ -38,25 +44,6 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
       </div>
 
       <div className="flex-1 px-5">
-        {/* My profile card */}
-        <div className="bg-card rounded-3xl p-5 shadow-card mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center">
-              <User className="w-7 h-7 text-primary-foreground" />
-            </div>
-            <div className="flex-1">
-              <p className="font-bold text-foreground text-lg">{currentUser.name}</p>
-              <div className="flex items-center gap-1">
-                <span className="text-secondary font-bold">{currentUser.points}</span>
-                <Star className="w-4 h-4 text-secondary fill-secondary" />
-              </div>
-            </div>
-            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              أنت
-            </span>
-          </div>
-        </div>
-
         {/* Friends section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -69,7 +56,7 @@ export function FriendsList({ onBack, onCreateChallenge }: FriendsListProps) {
 
           {/* Friends list */}
           <div className="space-y-3">
-            {friends.map((friend, index) => {
+            {friendsList.map((friend, index) => {
               const isSelected = selectedFriends.some(f => f.id === friend.id);
               
               return (
