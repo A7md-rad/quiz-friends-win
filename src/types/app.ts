@@ -12,11 +12,21 @@ export type Screen =
   | 'game-mode-selection'
   | 'create-game'
   | 'join-game'
-  | 'waiting-room';
+  | 'waiting-room'
+  | 'join-waiting-room';
 
 export type GameMode = 'create' | 'join';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
+
+export interface Question {
+  id: string;
+  text: string;
+  options: string[];
+  correctAnswer: number;
+  points: number;
+  difficulty?: Difficulty;
+}
 
 export interface User {
   id: string;
@@ -37,13 +47,6 @@ export interface Subject {
   questionsCount: number;
 }
 
-export interface Question {
-  id: string;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-  points: number;
-}
 
 export interface QuizState {
   currentQuestion: number;

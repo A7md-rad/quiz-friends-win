@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Check, Star, Calculator, Atom, FlaskConical, Leaf, BookOpen, Languages, Sparkles, type LucideIcon } from 'lucide-react';
-import { Subject, Question, QuizState } from '@/types/app';
-import { sampleQuestions } from '@/data/mockData';
+import { Subject, Question, QuizState, Difficulty } from '@/types/app';
+import { sampleQuestions, getQuestionsByDifficulty } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 
 interface QuizPageProps {
   subject: Subject;
   questionCount?: number;
+  difficulty?: Difficulty;
   onComplete: (score: number, correctAnswers: number, totalQuestions: number) => void;
   onExit: () => void;
 }
@@ -22,13 +23,11 @@ const subjectIconMap: Record<string, LucideIcon> = {
   languages: Languages,
 };
 
-export function QuizPage({ subject, questionCount = 10, onComplete, onExit }: QuizPageProps) {
-  // خلط الأسئلة وتحديد العدد المطلوب
+export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', onComplete, onExit }: QuizPageProps) {
+  // فلترة الأسئلة حسب الصعوبة
   const questions = useMemo(() => {
-    const originalQuestions = sampleQuestions[subject.id] || sampleQuestions.math;
-    const shuffled = shuffleQuestions(originalQuestions);
-    return shuffled.slice(0, Math.min(questionCount, shuffled.length));
-  }, [subject.id, questionCount]);
+    return getQuestionsByDifficulty(subject.id, difficulty, questionCount);
+  }, [subject.id, questionCount, difficulty]);
 
   const [state, setState] = useState<QuizState>({
     currentQuestion: 0,
