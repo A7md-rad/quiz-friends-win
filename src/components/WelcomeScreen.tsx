@@ -59,7 +59,7 @@ export function WelcomeScreen({ onSoloChallenge, onFriendsChallenge, onProfile, 
 
         {/* App name */}
         <h1 className="text-4xl font-extrabold text-foreground mb-3">
-          لعب وتعلّم
+          العب و تعلم
         </h1>
 
         {/* Tagline */}
