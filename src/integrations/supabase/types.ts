@@ -14,7 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_players: {
+        Row: {
+          current_question: number
+          game_id: string
+          id: string
+          is_host: boolean
+          is_ready: boolean
+          joined_at: string
+          name: string
+          score: number
+        }
+        Insert: {
+          current_question?: number
+          game_id: string
+          id?: string
+          is_host?: boolean
+          is_ready?: boolean
+          joined_at?: string
+          name: string
+          score?: number
+        }
+        Update: {
+          current_question?: number
+          game_id?: string
+          id?: string
+          is_host?: boolean
+          is_ready?: boolean
+          joined_at?: string
+          name?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      games: {
+        Row: {
+          code: string
+          created_at: string
+          difficulty: string
+          host_name: string
+          id: string
+          max_players: number
+          question_count: number
+          status: string
+          subject_id: string
+          subject_name: string
+          time_per_question: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          difficulty?: string
+          host_name: string
+          id?: string
+          max_players?: number
+          question_count?: number
+          status?: string
+          subject_id: string
+          subject_name: string
+          time_per_question?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          difficulty?: string
+          host_name?: string
+          id?: string
+          max_players?: number
+          question_count?: number
+          status?: string
+          subject_id?: string
+          subject_name?: string
+          time_per_question?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

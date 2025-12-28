@@ -29,7 +29,7 @@ export function JoinGame({ onBack, onJoinSuccess }: JoinGameProps) {
     
     // التحقق من وجود اللعبة في قاعدة البيانات
     const { data: game, error } = await supabase
-      .from('games')
+      .from('games' as any)
       .select('*')
       .eq('code', code)
       .eq('status', 'waiting')
