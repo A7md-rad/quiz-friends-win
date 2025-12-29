@@ -36,7 +36,7 @@ const Index = () => {
   const [gameSettings, setGameSettings] = useState<GameSettings>({
     code: '',
     subject: null,
-    questionCount: 10,
+    questionCount: 5,
     maxPlayers: 2,
     isHost: false,
     difficulty: 'medium',

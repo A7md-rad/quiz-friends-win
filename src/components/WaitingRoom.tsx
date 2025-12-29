@@ -169,7 +169,37 @@ export function WaitingRoom({
       )
       .subscribe();
 
+    // محاكاة دخول لاعبين عشوائيين للاختبار
+    const randomNames = ['أحمد', 'محمد', 'سارة', 'فاطمة', 'علي', 'نور', 'ياسر', 'هدى'];
+    let currentPlayerCount = 1; // نبدأ من 1 لأن المضيف موجود
+
+    const addRandomPlayer = async () => {
+      // نتحقق من العدد الحالي قبل الإضافة
+      const { data: currentPlayers } = await (supabase as any)
+        .from('game_players')
+        .select('id')
+        .eq('game_id', gameId);
+      
+      currentPlayerCount = currentPlayers?.length || 1;
+      
+      if (currentPlayerCount < maxPlayers) {
+        const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+        await (supabase as any)
+          .from('game_players')
+          .insert({
+            game_id: gameId,
+            name: randomName,
+            is_host: false,
+            is_ready: true
+          });
+      }
+    };
+
+    // إضافة لاعب عشوائي كل 3 ثواني
+    const interval = setInterval(addRandomPlayer, 3000);
+
     return () => {
+      clearInterval(interval);
       supabase.removeChannel(channel);
     };
   }, [gameId, maxPlayers]);
