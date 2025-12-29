@@ -33,7 +33,7 @@ const difficultyOptions: { value: Difficulty; label: string; color: string }[] =
 export function CreateGame({ onBack, onStartGame }: CreateGameProps) {
   const [gameCode, setGameCode] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const [questionCount, setQuestionCount] = useState(10);
+  const [questionCount, setQuestionCount] = useState(5);
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [timePerQuestion, setTimePerQuestion] = useState(15);
