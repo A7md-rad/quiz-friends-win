@@ -315,7 +315,7 @@ const Index = () => {
               setQuizKey(prev => prev + 1);
               setCurrentScreen(isChallenge ? "challenge-quiz" : "quiz");
             }}
-            onSelectSubject={() => goToSubjectSelection(false)}
+            onSelectSubject={() => goToSubjectSelection(isChallenge)}
             onHome={goToWelcome}
           />
         ) : null;
