@@ -6,6 +6,7 @@ import { getQuestionsByDifficulty } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 import { playCountdownBeep, playTimeUpSound, playCorrectSound, playWrongSound } from '@/utils/soundEffects';
+import { CountdownOverlay } from './CountdownOverlay';
 
 interface Player {
   id: string;
@@ -54,6 +55,7 @@ export function MultiplayerQuiz({
   const [soundEnabled, setSoundEnabled] = useState(true);
   const lastPlayedSecond = useRef<number>(0);
   const [myPlayerId, setMyPlayerId] = useState<string>('1'); // معرف اللاعب الحالي
+  const [showCountdown, setShowCountdown] = useState(true);
 
   const currentQ = questions[currentQuestion];
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -113,7 +115,7 @@ export function MultiplayerQuiz({
 
   // Timer countdown with sound effects
   useEffect(() => {
-    if (phase !== 'answering') return;
+    if (phase !== 'answering' || showCountdown) return;
     
     const interval = setInterval(() => {
       setTimer(prev => {
@@ -138,7 +140,7 @@ export function MultiplayerQuiz({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [phase, currentQuestion, soundEnabled]);
+  }, [phase, currentQuestion, soundEnabled, showCountdown]);
 
   // Reset last played second when question changes
   useEffect(() => {
@@ -260,7 +262,11 @@ export function MultiplayerQuiz({
   const answeredCount = players.filter(p => p.hasAnswered).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-card">
+    <>
+      {showCountdown && (
+        <CountdownOverlay onComplete={() => setShowCountdown(false)} />
+      )}
+      <div className="min-h-screen flex flex-col bg-card">
       {/* Header */}
       <div className="p-4 bg-gradient-to-b from-primary/20 to-transparent">
         <div className="flex items-center justify-between mb-3">
@@ -481,5 +487,6 @@ export function MultiplayerQuiz({
         </div>
       )}
     </div>
+    </>
   );
 }

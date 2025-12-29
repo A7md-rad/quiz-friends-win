@@ -5,6 +5,7 @@ import { Subject, Question, QuizState, Difficulty } from '@/types/app';
 import { sampleQuestions, getQuestionsByDifficulty } from '@/data/mockData';
 import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
+import { CountdownOverlay } from './CountdownOverlay';
 
 interface QuizPageProps {
   subject: Subject;
@@ -48,10 +49,11 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', t
   const progress = ((state.currentQuestion + 1) / questions.length) * 100;
 
   const [correctCount, setCorrectCount] = useState(0);
+  const [showCountdown, setShowCountdown] = useState(true);
 
   // Timer effect
   useEffect(() => {
-    if (showFeedback) return;
+    if (showFeedback || showCountdown) return;
     
     timerRef.current = setInterval(() => {
       setTimer(prev => {
@@ -67,7 +69,7 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', t
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [state.currentQuestion, showFeedback]);
+  }, [state.currentQuestion, showFeedback, showCountdown]);
 
   const handleTimeUp = () => {
     if (showFeedback) return;
@@ -129,7 +131,11 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', t
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-card dotted-bg">
+    <>
+      {showCountdown && (
+        <CountdownOverlay onComplete={() => setShowCountdown(false)} />
+      )}
+      <div className="min-h-screen flex flex-col bg-card dotted-bg">
       {/* Header */}
       <div className="p-5">
         <div className="flex items-center justify-between mb-4">
@@ -263,5 +269,6 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', t
         </button>
       </div>
     </div>
+    </>
   );
 }
