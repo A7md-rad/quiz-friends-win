@@ -25,9 +25,10 @@ const subjectIconMap: Record<string, LucideIcon> = {
 };
 
 export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', timePerQuestion = 15, onComplete, onExit }: QuizPageProps) {
-  // فلترة الأسئلة حسب الصعوبة
+  // فلترة الأسئلة حسب الصعوبة وخلط الخيارات
   const questions = useMemo(() => {
-    return getQuestionsByDifficulty(subject.id, difficulty, questionCount);
+    const filtered = getQuestionsByDifficulty(subject.id, difficulty, questionCount);
+    return shuffleQuestions(filtered);
   }, [subject.id, questionCount, difficulty]);
 
   const [timer, setTimer] = useState(timePerQuestion);

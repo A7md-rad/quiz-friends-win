@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { X, Check, Crown, Clock, Volume2, VolumeX } from 'lucide-react';
 import { Subject, Question, Friend, Difficulty } from '@/types/app';
 import { getQuestionsByDifficulty } from '@/data/mockData';
+import { shuffleQuestions } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 import { playCountdownBeep, playTimeUpSound, playCorrectSound, playWrongSound } from '@/utils/soundEffects';
 
@@ -38,9 +39,10 @@ export function MultiplayerQuiz({
   onComplete, 
   onExit 
 }: MultiplayerQuizProps) {
-  // فلترة الأسئلة حسب الصعوبة المختارة
+  // فلترة الأسئلة حسب الصعوبة المختارة وخلط الخيارات
   const questions = useMemo(() => {
-    return getQuestionsByDifficulty(subject.id, difficulty, questionCount);
+    const filtered = getQuestionsByDifficulty(subject.id, difficulty, questionCount);
+    return shuffleQuestions(filtered);
   }, [subject.id, questionCount, difficulty]);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
