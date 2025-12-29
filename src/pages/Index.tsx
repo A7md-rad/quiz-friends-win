@@ -78,6 +78,7 @@ const Index = () => {
   };
 
   const goToSubjectSelection = (forChallenge = false) => {
+    setSelectedSubject(null);
     setIsChallenge(forChallenge);
     setCurrentScreen("subject-selection");
   };
