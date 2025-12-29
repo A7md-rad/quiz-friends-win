@@ -31,6 +31,7 @@ const Index = () => {
   const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
   const [quizResult, setQuizResult] = useState({ score: 0, correct: 0, total: 0 });
   const [isChallenge, setIsChallenge] = useState(false);
+  const [quizKey, setQuizKey] = useState(0); // مفتاح لإعادة تحميل الأسئلة
   
   // Game settings for multiplayer
   const [gameSettings, setGameSettings] = useState<GameSettings>({
@@ -250,6 +251,7 @@ const Index = () => {
       case "quiz":
         return selectedSubject ? (
           <QuizPage 
+            key={quizKey}
             subject={selectedSubject} 
             questionCount={soloQuestionCount}
             difficulty={soloDifficulty}
@@ -288,6 +290,7 @@ const Index = () => {
       case "challenge-quiz":
         return selectedSubject ? (
           <MultiplayerQuiz
+            key={quizKey}
             subject={selectedSubject}
             selectedFriends={selectedFriends}
             questionCount={gameSettings.questionCount}
@@ -307,7 +310,10 @@ const Index = () => {
             correctAnswers={quizResult.correct}
             totalQuestions={quizResult.total}
             subject={selectedSubject}
-            onRetry={() => setCurrentScreen(isChallenge ? "challenge-quiz" : "quiz")}
+            onRetry={() => {
+              setQuizKey(prev => prev + 1);
+              setCurrentScreen(isChallenge ? "challenge-quiz" : "quiz");
+            }}
             onSelectSubject={() => goToSubjectSelection(false)}
             onHome={goToWelcome}
           />
