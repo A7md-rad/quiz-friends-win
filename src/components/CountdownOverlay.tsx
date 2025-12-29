@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface CountdownOverlayProps {
@@ -9,6 +9,8 @@ interface CountdownOverlayProps {
 export function CountdownOverlay({ onComplete, startFrom = 3 }: CountdownOverlayProps) {
   const [count, setCount] = useState(startFrom);
   const [showGo, setShowGo] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     if (count > 0) {
@@ -19,11 +21,11 @@ export function CountdownOverlay({ onComplete, startFrom = 3 }: CountdownOverlay
     } else if (count === 0 && !showGo) {
       setShowGo(true);
       const timer = setTimeout(() => {
-        onComplete();
+        onCompleteRef.current();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [count, showGo, onComplete]);
+  }, [count, showGo]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
