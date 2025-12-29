@@ -194,15 +194,17 @@ export function MultiplayerQuiz({
       }
       return p;
     }));
-
-    // Check if all players answered
-    const allAnswered = players.every(p => p.id === myPlayerId ? true : p.hasAnswered);
-    if (allAnswered) {
-      setTimeout(() => {
-        setPhase('results');
-      }, 500);
-    }
   };
+
+  // تحويل الوقت لـ 3 ثواني عندما يجيب جميع اللاعبين
+  useEffect(() => {
+    if (phase !== 'answering') return;
+    
+    const allAnswered = players.every(p => p.hasAnswered);
+    if (allAnswered && players.length > 0 && timer > 3) {
+      setTimer(3);
+    }
+  }, [players, phase, timer]);
 
   // Calculate scores when showing results and play sound
   useEffect(() => {
