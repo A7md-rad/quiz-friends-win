@@ -307,7 +307,7 @@ const Index = () => {
             correctAnswers={quizResult.correct}
             totalQuestions={quizResult.total}
             subject={selectedSubject}
-            onRetry={() => setCurrentScreen("quiz")}
+            onRetry={() => setCurrentScreen(isChallenge ? "challenge-quiz" : "quiz")}
             onSelectSubject={() => goToSubjectSelection(false)}
             onHome={goToWelcome}
           />
