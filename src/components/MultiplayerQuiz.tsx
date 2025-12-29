@@ -355,7 +355,12 @@ export function MultiplayerQuiz({
                     </div>
                   )}
                 </div>
-                <span className="text-xs font-medium text-foreground">{player.name}</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-medium text-foreground">{player.name}</span>
+                  {player.id === myPlayerId && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-bold">أنت</span>
+                  )}
+                </div>
                 <span className="text-xs text-primary font-bold">{player.score}</span>
               </div>
             );
