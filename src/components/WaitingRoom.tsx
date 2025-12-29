@@ -152,6 +152,8 @@ export function WaitingRoom({
           if (payload.eventType === 'INSERT') {
             const newPlayer = payload.new;
             setPlayers(prev => {
+              // منع الإضافة إذا وصلنا للحد الأقصى
+              if (prev.length >= maxPlayers) return prev;
               if (prev.some(p => p.id === newPlayer.id)) return prev;
               toast.success(`${newPlayer.name} انضم للعبة!`);
               return [...prev, {
@@ -167,31 +169,10 @@ export function WaitingRoom({
       )
       .subscribe();
 
-    // محاكاة دخول لاعبين عشوائيين للاختبار
-    const randomNames = ['أحمد', 'محمد', 'سارة', 'فاطمة', 'علي', 'نور', 'ياسر', 'هدى'];
-    const addRandomPlayer = async () => {
-      const currentCount = players.length;
-      if (currentCount < maxPlayers) {
-        const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-        await (supabase as any)
-          .from('game_players')
-          .insert({
-            game_id: gameId,
-            name: randomName,
-            is_host: false,
-            is_ready: true
-          });
-      }
-    };
-
-    // إضافة لاعب عشوائي كل 3 ثواني
-    const interval = setInterval(addRandomPlayer, 3000);
-
     return () => {
-      clearInterval(interval);
       supabase.removeChannel(channel);
     };
-  }, [gameId, players.length, maxPlayers]);
+  }, [gameId, maxPlayers]);
 
   // تنظيف عند الخروج
   const handleBack = async () => {
@@ -317,40 +298,53 @@ export function WaitingRoom({
         </h2>
         
         <div className="space-y-3">
-          {players.map((player, index) => (
-            <div
-              key={player.id}
-              className={cn(
-                "bg-card rounded-xl p-4 shadow-card flex items-center gap-3 animate-in slide-in-from-right",
-                player.isHost && "border-2 border-primary"
-              )}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg relative",
-                player.isHost ? "gradient-primary text-primary-foreground" : "gradient-secondary text-secondary-foreground"
-              )}>
-                {player.name.charAt(0)}
-                {player.isHost && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-warning rounded-full flex items-center justify-center">
-                    <Crown className="w-3 h-3 text-warning-foreground" />
-                  </div>
+          {players.map((player, index) => {
+            // ألوان مختلفة للاعبين لتمييزهم
+            const avatarColors = [
+              'bg-primary text-primary-foreground',
+              'bg-secondary text-secondary-foreground',
+              'bg-accent text-accent-foreground',
+              'bg-success text-success-foreground',
+              'bg-warning text-warning-foreground',
+              'bg-destructive text-destructive-foreground',
+            ];
+            const colorClass = player.isHost ? 'gradient-primary text-primary-foreground' : avatarColors[(index) % avatarColors.length];
+            
+            return (
+              <div
+                key={player.id}
+                className={cn(
+                  "bg-card rounded-xl p-4 shadow-card flex items-center gap-3 animate-in slide-in-from-right",
+                  player.isHost && "border-2 border-primary"
                 )}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg relative",
+                  colorClass
+                )}>
+                  {player.name.charAt(0)}
+                  {player.isHost && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-warning rounded-full flex items-center justify-center">
+                      <Crown className="w-3 h-3 text-warning-foreground" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <p className="font-bold text-foreground">{player.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {player.isHost ? 'المضيف' : 'لاعب'}
+                  </p>
+                </div>
+                
+                <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
               </div>
-              
-              <div className="flex-1">
-                <p className="font-bold text-foreground">{player.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {player.isHost ? 'المضيف' : 'لاعب'}
-                </p>
-              </div>
-              
-              <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
-            </div>
-          ))}
+            );
+          })}
           
           {/* Empty slots */}
-          {Array.from({ length: maxPlayers - players.length }).map((_, index) => (
+          {Array.from({ length: Math.max(0, maxPlayers - players.length) }).map((_, index) => (
             <div
               key={`empty-${index}`}
               className="bg-card/50 rounded-xl p-4 border-2 border-dashed border-border flex items-center gap-3"

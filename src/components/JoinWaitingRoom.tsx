@@ -279,48 +279,61 @@ export function JoinWaitingRoom({ gameCode, playerName, onBack, onGameStart }: J
           </div>
 
           <div className="space-y-3">
-            {players.map((player, index) => (
-              <div
-                key={player.id}
-                className={cn(
-                  'flex items-center gap-3 p-3 rounded-xl transition-all',
-                  player.isHost ? 'bg-primary/10' : 'bg-muted/50',
-                  player.id === playerId && 'ring-2 ring-secondary'
-                )}
-              >
-                {/* Avatar */}
+            {players.map((player, index) => {
+              // ألوان مختلفة للاعبين لتمييزهم
+              const avatarColors = [
+                'bg-primary',
+                'bg-secondary',
+                'bg-accent',
+                'bg-success',
+                'bg-warning',
+                'bg-destructive',
+              ];
+              const colorClass = player.isHost ? 'bg-primary' : avatarColors[(index) % avatarColors.length];
+              
+              return (
                 <div
+                  key={player.id}
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold relative',
-                    player.isHost ? 'bg-primary' : 'bg-secondary'
+                    'flex items-center gap-3 p-3 rounded-xl transition-all',
+                    player.isHost ? 'bg-primary/10' : 'bg-muted/50',
+                    player.id === playerId && 'ring-2 ring-secondary'
                   )}
                 >
-                  {player.name.charAt(0)}
-                  {player.isHost && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-warning rounded-full flex items-center justify-center">
-                      <Crown className="w-2.5 h-2.5 text-warning-foreground" />
-                    </div>
-                  )}
-                </div>
+                  {/* Avatar */}
+                  <div
+                    className={cn(
+                      'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold relative',
+                      colorClass
+                    )}
+                  >
+                    {player.name.charAt(0)}
+                    {player.isHost && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-warning rounded-full flex items-center justify-center">
+                        <Crown className="w-2.5 h-2.5 text-warning-foreground" />
+                      </div>
+                    )}
+                  </div>
 
-                {/* Name */}
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">{player.name}</p>
-                  {player.isHost && (
-                    <span className="text-xs text-primary">صاحب اللعبة</span>
-                  )}
-                  {player.id === playerId && !player.isHost && (
-                    <span className="text-xs text-secondary">أنت</span>
-                  )}
-                </div>
+                  {/* Name */}
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">{player.name}</p>
+                    {player.isHost && (
+                      <span className="text-xs text-primary">صاحب اللعبة</span>
+                    )}
+                    {player.id === playerId && !player.isHost && (
+                      <span className="text-xs text-secondary">أنت</span>
+                    )}
+                  </div>
 
-                {/* Status */}
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-xs text-muted-foreground">متصل</span>
+                  {/* Status */}
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                    <span className="text-xs text-muted-foreground">متصل</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

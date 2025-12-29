@@ -304,43 +304,56 @@ export function MultiplayerQuiz({
       {/* Players status */}
       <div className="px-4 py-3">
         <div className="flex items-center justify-center gap-3 flex-wrap">
-          {players.map((player) => (
-            <div 
-              key={player.id}
-              className={cn(
-                "flex flex-col items-center gap-1 p-2 rounded-xl transition-all",
-                player.hasAnswered && phase === 'answering' && "bg-success/20",
-                phase === 'results' && player.currentAnswer === currentQ.correctAnswer && "bg-success/20",
-                phase === 'results' && player.currentAnswer !== currentQ.correctAnswer && "bg-destructive/10"
-              )}
-            >
-              <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold relative",
-                player.id === '1' ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-              )}>
-                {player.name.charAt(0)}
-                {player.hasAnswered && phase === 'answering' && (
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full flex items-center justify-center">
-                    <Check className="w-3 h-3 text-success-foreground" />
-                  </div>
+          {players.map((player, index) => {
+            // ألوان مختلفة للاعبين لتمييزهم
+            const avatarColors = [
+              'gradient-primary text-primary-foreground',
+              'bg-secondary text-secondary-foreground',
+              'bg-accent text-accent-foreground',
+              'bg-success text-success-foreground',
+              'bg-warning text-warning-foreground',
+              'bg-destructive text-destructive-foreground',
+            ];
+            const colorClass = player.id === '1' ? 'gradient-primary text-primary-foreground' : avatarColors[(index) % avatarColors.length];
+            
+            return (
+              <div 
+                key={player.id}
+                className={cn(
+                  "flex flex-col items-center gap-1 p-2 rounded-xl transition-all",
+                  player.hasAnswered && phase === 'answering' && "bg-success/20",
+                  phase === 'results' && player.currentAnswer === currentQ.correctAnswer && "bg-success/20",
+                  phase === 'results' && player.currentAnswer !== currentQ.correctAnswer && "bg-destructive/10"
                 )}
-                {phase === 'results' && (
-                  <div className={cn(
-                    "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center",
-                    player.currentAnswer === currentQ.correctAnswer ? "bg-success" : "bg-destructive"
-                  )}>
-                    {player.currentAnswer === currentQ.correctAnswer ? (
+              >
+                <div className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold relative",
+                  colorClass
+                )}>
+                  {player.name.charAt(0)}
+                  {player.hasAnswered && phase === 'answering' && (
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full flex items-center justify-center">
                       <Check className="w-3 h-3 text-success-foreground" />
-                    ) : (
-                      <X className="w-3 h-3 text-destructive-foreground" />
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                  {phase === 'results' && (
+                    <div className={cn(
+                      "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center",
+                      player.currentAnswer === currentQ.correctAnswer ? "bg-success" : "bg-destructive"
+                    )}>
+                      {player.currentAnswer === currentQ.correctAnswer ? (
+                        <Check className="w-3 h-3 text-success-foreground" />
+                      ) : (
+                        <X className="w-3 h-3 text-destructive-foreground" />
+                      )}
+                    </div>
+                  )}
+                </div>
+                <span className="text-xs font-medium text-foreground">{player.name}</span>
+                <span className="text-xs text-primary font-bold">{player.score}</span>
               </div>
-              <span className="text-xs font-medium text-foreground">{player.name}</span>
-              <span className="text-xs text-primary font-bold">{player.score}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
         {phase === 'answering' && (
