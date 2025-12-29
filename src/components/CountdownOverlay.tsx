@@ -8,34 +8,40 @@ interface CountdownOverlayProps {
 
 export function CountdownOverlay({ onComplete, startFrom = 3 }: CountdownOverlayProps) {
   const [count, setCount] = useState(startFrom);
-  const [showGo, setShowGo] = useState(false);
+  const [phase, setPhase] = useState<'counting' | 'go' | 'done'>('counting');
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
+  // العد التنازلي
   useEffect(() => {
-    console.log('Countdown effect - count:', count, 'showGo:', showGo);
+    if (phase !== 'counting') return;
     
     if (count > 0) {
       const timer = setTimeout(() => {
-        console.log('Decreasing count from', count, 'to', count - 1);
         setCount(prev => prev - 1);
       }, 1000);
       return () => clearTimeout(timer);
-    } else if (count === 0 && !showGo) {
-      console.log('Count is 0, showing GO');
-      setShowGo(true);
-      const timer = setTimeout(() => {
-        console.log('Calling onComplete');
-        onCompleteRef.current();
-      }, 800);
-      return () => clearTimeout(timer);
+    } else {
+      setPhase('go');
     }
-  }, [count, showGo]);
+  }, [count, phase]);
+
+  // عرض "ابدأ" ثم الانتقال للعبة
+  useEffect(() => {
+    if (phase !== 'go') return;
+    
+    const timer = setTimeout(() => {
+      setPhase('done');
+      onCompleteRef.current();
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, [phase]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
       <div className="text-center">
-        {!showGo ? (
+        {phase === 'counting' && count > 0 ? (
           <div
             key={count}
             className={cn(
