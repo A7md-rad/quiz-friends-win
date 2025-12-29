@@ -68,7 +68,7 @@ export function MultiplayerQuiz({
       
       allPlayers = gamePlayers.map(p => ({
         id: p.id,
-        name: p.isHost ? 'أنت' : p.name, // تغيير اسم المضيف لـ "أنت"
+        name: p.name,
         avatar: 'user',
         score: 0,
         currentAnswer: null,
