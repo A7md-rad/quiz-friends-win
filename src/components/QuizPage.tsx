@@ -130,12 +130,21 @@ export function QuizPage({ subject, questionCount = 10, difficulty = 'medium', t
     }
   };
 
+  // التحقق من وجود أسئلة
+  if (!currentQ) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-card">
+        <p className="text-xl text-muted-foreground">لا توجد أسئلة متاحة لهذا المستوى</p>
+      </div>
+    );
+  }
+
   return (
     <>
       {showCountdown && (
         <CountdownOverlay onComplete={() => setShowCountdown(false)} />
       )}
-      <div className="min-h-screen flex flex-col bg-card dotted-bg">
+      <div className={cn("min-h-screen flex flex-col bg-card dotted-bg", showCountdown && "invisible")}>
       {/* Header */}
       <div className="p-5">
         <div className="flex items-center justify-between mb-4">

@@ -261,12 +261,21 @@ export function MultiplayerQuiz({
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
   const answeredCount = players.filter(p => p.hasAnswered).length;
 
+  // التحقق من وجود أسئلة
+  if (!currentQ) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-card">
+        <p className="text-xl text-muted-foreground">لا توجد أسئلة متاحة لهذا المستوى</p>
+      </div>
+    );
+  }
+
   return (
     <>
       {showCountdown && (
         <CountdownOverlay onComplete={() => setShowCountdown(false)} />
       )}
-      <div className="min-h-screen flex flex-col bg-card">
+      <div className={cn("min-h-screen flex flex-col bg-card", showCountdown && "invisible")}>
       {/* Header */}
       <div className="p-4 bg-gradient-to-b from-primary/20 to-transparent">
         <div className="flex items-center justify-between mb-3">
