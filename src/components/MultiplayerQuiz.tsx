@@ -51,6 +51,7 @@ export function MultiplayerQuiz({
   const [correctCount, setCorrectCount] = useState(0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const lastPlayedSecond = useRef<number>(0);
+  const [myPlayerId, setMyPlayerId] = useState<string>('1'); // معرف اللاعب الحالي
 
   const currentQ = questions[currentQuestion];
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -58,12 +59,16 @@ export function MultiplayerQuiz({
   // Initialize players - استخدام اللاعبين من غرفة الانتظار أو إنشاء لاعبين وهميين
   useEffect(() => {
     let allPlayers: Player[];
+    let currentPlayerId = '1';
     
     if (gamePlayers.length > 0) {
-      // استخدام اللاعبين من غرفة الانتظار
+      // استخدام اللاعبين من غرفة الانتظار - المضيف هو اللاعب الحالي
+      const hostPlayer = gamePlayers.find(p => p.isHost);
+      currentPlayerId = hostPlayer?.id || gamePlayers[0].id;
+      
       allPlayers = gamePlayers.map(p => ({
         id: p.id,
-        name: p.name,
+        name: p.isHost ? 'أنت' : p.name, // تغيير اسم المضيف لـ "أنت"
         avatar: 'user',
         score: 0,
         currentAnswer: null,
@@ -100,6 +105,7 @@ export function MultiplayerQuiz({
       ];
     }
     
+    setMyPlayerId(currentPlayerId);
     setPlayers(allPlayers);
   }, [selectedFriends, gamePlayers, maxPlayers]);
 
@@ -141,8 +147,8 @@ export function MultiplayerQuiz({
   useEffect(() => {
     if (phase !== 'answering') return;
 
-    // Get opponent IDs (not the first player which is the user)
-    const opponentIds = players.filter(p => p.id !== '1').map(p => p.id);
+    // Get opponent IDs (not the current user)
+    const opponentIds = players.filter(p => p.id !== myPlayerId).map(p => p.id);
     
     opponentIds.forEach((opponentId) => {
       const delay = 2000 + Math.random() * 5000; // 2-7 seconds
@@ -162,12 +168,12 @@ export function MultiplayerQuiz({
       }, delay);
       return () => clearTimeout(timeout);
     });
-  }, [currentQuestion, phase, players.length]);
+  }, [currentQuestion, phase, players.length, myPlayerId]);
 
   const handleTimeUp = () => {
     // Make sure all players have answered (random for those who haven't)
     setPlayers(prev => prev.map(p => {
-      if (!p.hasAnswered && p.id !== '1') {
+      if (!p.hasAnswered && p.id !== myPlayerId) {
         const answerCorrectly = Math.random() < 0.5;
         const answer = answerCorrectly ? currentQ.correctAnswer : 
           Math.floor(Math.random() * currentQ.options.length);
@@ -183,14 +189,14 @@ export function MultiplayerQuiz({
     
     setUserAnswer(answerIndex);
     setPlayers(prev => prev.map(p => {
-      if (p.id === '1') {
+      if (p.id === myPlayerId) {
         return { ...p, currentAnswer: answerIndex, hasAnswered: true };
       }
       return p;
     }));
 
     // Check if all players answered
-    const allAnswered = players.every(p => p.id === '1' ? true : p.hasAnswered);
+    const allAnswered = players.every(p => p.id === myPlayerId ? true : p.hasAnswered);
     if (allAnswered) {
       setTimeout(() => {
         setPhase('results');
@@ -235,7 +241,7 @@ export function MultiplayerQuiz({
       setPlayers(prev => prev.map(p => ({ ...p, currentAnswer: null, hasAnswered: false })));
     } else {
       // Quiz complete - حساب الإجابات الصحيحة بشكل صحيح
-      const userPlayer = players.find(p => p.id === '1');
+      const userPlayer = players.find(p => p.id === myPlayerId);
       // إضافة 1 إذا كانت الإجابة الأخيرة صحيحة (لأن correctCount لم يتحدث بعد)
       const finalCorrectCount = userAnswer === currentQ.correctAnswer ? correctCount + 1 : correctCount;
       onComplete(userPlayer?.score || 0, finalCorrectCount, questions.length);
@@ -314,7 +320,7 @@ export function MultiplayerQuiz({
               'bg-warning text-warning-foreground',
               'bg-destructive text-destructive-foreground',
             ];
-            const colorClass = player.id === '1' ? 'gradient-primary text-primary-foreground' : avatarColors[(index) % avatarColors.length];
+            const colorClass = player.id === myPlayerId ? 'gradient-primary text-primary-foreground' : avatarColors[(index) % avatarColors.length];
             
             return (
               <div 
@@ -427,7 +433,7 @@ export function MultiplayerQuiz({
                         key={p.id}
                         className={cn(
                           "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 border-card",
-                          p.id === '1' ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                          p.id === myPlayerId ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
                         )}
                       >
                         {p.name.charAt(0)}
@@ -453,7 +459,7 @@ export function MultiplayerQuiz({
                   {index === 0 && <Crown className="w-5 h-5 text-warning mb-1" />}
                   <div className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
-                    player.id === '1' ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                    player.id === myPlayerId ? "gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
                   )}>
                     {player.name.charAt(0)}
                   </div>
