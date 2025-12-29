@@ -242,11 +242,9 @@ export function MultiplayerQuiz({
       setUserAnswer(null);
       setPlayers(prev => prev.map(p => ({ ...p, currentAnswer: null, hasAnswered: false })));
     } else {
-      // Quiz complete - حساب الإجابات الصحيحة بشكل صحيح
+      // Quiz complete - استخدام correctCount مباشرة لأنه تم تحديثه في useEffect
       const userPlayer = players.find(p => p.id === myPlayerId);
-      // إضافة 1 إذا كانت الإجابة الأخيرة صحيحة (لأن correctCount لم يتحدث بعد)
-      const finalCorrectCount = userAnswer === currentQ.correctAnswer ? correctCount + 1 : correctCount;
-      onComplete(userPlayer?.score || 0, finalCorrectCount, questions.length);
+      onComplete(userPlayer?.score || 0, correctCount, questions.length);
     }
   };
 
